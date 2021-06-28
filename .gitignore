@@ -1,3 +1,6 @@
+# tkg_analytic project files to ignore
+run.py #development server
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
