@@ -8,6 +8,7 @@ from dash.dependencies import Input, Output
 from app import app
 from pages import page_1
 from pages import page_2
+from pages import meal_tag
 
 ### Page container ###
 page_container = html.Div(
@@ -37,6 +38,11 @@ index_layout = html.Div(
             children='Go to Page 2',
             href='/page-2',
         ),
+        html.Br(),
+        dcc.Link(
+            children='Go to Meal Tagging',
+            href='/meal-tag',
+        ),
     ]
 )
 
@@ -47,6 +53,7 @@ app.validation_layout = html.Div(
         index_layout,
         page_1.layout,
         page_2.layout,
+        meal_tag.layout,
     ]
 )
 
@@ -68,5 +75,7 @@ def display_page(pathname):
         return page_1.layout
     elif pathname == '/page-2':
         return page_2.layout
+    elif pathname == '/meal-tag':
+        return meal_tag.layout
     else:
         return '404'
