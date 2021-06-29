@@ -2,6 +2,7 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 
 ### Import Dash Instance and Pages ###
@@ -27,8 +28,12 @@ page_container = html.Div(
 app.layout = page_container
 
 ### Index Page Layout ###
-index_layout = html.Div(
+index_layout = dbc.Jumbotron(
     children=[
+        html.H1(
+            children="Welcome to TGK Analytics",
+            className="display-4",
+        ),
         dcc.Link(
             children='Go to Page 1',
             href='/page-1',
