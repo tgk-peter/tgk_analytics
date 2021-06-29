@@ -7,9 +7,19 @@ from dash.dependencies import Input, Output
 
 ### Import Dash Instance and Pages ###
 from app import app
-from pages import page_1
-from pages import page_2
-from pages import meal_tag
+from pages import page_1, page_2, meal_tag
+
+### Navigation Bar ###
+navbar = dbc.NavbarSimple(
+    children=[
+        dbc.NavItem(dbc.NavLink("Page 1", href="/page-1"), id="page-1-link"),
+        dbc.NavItem(dbc.NavLink("Page 2", href="/page-2"), id="page-2-link")
+    ],
+    brand="NavbarSimple",
+    brand_href="/",
+    color="primary",
+    dark=True,
+)
 
 ### Page container ###
 page_container = html.Div(
