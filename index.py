@@ -72,13 +72,10 @@ app.validation_layout = html.Div(
         )]
 )
 def display_page(pathname):
-    if pathname == '/':
-        return index_layout
-    elif pathname == '/page-1':
-        return page_1.layout
-    elif pathname == '/page-2':
-        return page_2.layout
-    elif pathname == '/meal-tag':
-        return meal_tag.layout
-    else:
-        return '404'
+    switcher = {
+        "/" : index_layout,
+        "/page-1" : page_1.layout,
+        "/page-2" : page_2.layout,
+        "/meal-tag" : meal_tag.layout
+    }
+    return switcher.get(pathname, "404")
