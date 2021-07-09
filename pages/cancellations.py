@@ -8,7 +8,7 @@ import requests
 import json
 import time
 import pandas as pd
-from datetime import date, datetime as dt
+from datetime import date, timedelta, datetime as dt
 
 from config import recharge_api_token
 
@@ -84,6 +84,7 @@ app.layout = html.Div(
             min_date_allowed=date(2019, 6, 1),
             max_date_allowed=date.today(),
             initial_visible_month=date.today(),
+            start_date=date.today() - timedelta(days=7),
             end_date=date.today(),
         ),
         dbc.Table.from_dataframe(
@@ -108,8 +109,8 @@ app.layout = html.Div(
 '''
 @app.callback(
     Output(
-        component_id='page-2-content',
-        component_property='children',
+        component_id='table_counts',
+        component_property='df',
     ),
     [Input(
         component_id='page-2-radios',
