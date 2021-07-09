@@ -67,9 +67,11 @@ df_time_slice_counts = df_time_slice["cancellation_reason"].value_counts().to_fr
 df_time_slice_counts.rename(columns={"index":"Reason", "cancellation_reason":"Count"}, inplace=True)
 #df_time_slice_counts["% of total"] = df_time_slice_counts["Count"] / df_time_slice_counts["Count"].sum()*100
 
-# DataFrame for cancellation cancellation reasons
-df_time_slice_reasons = df_time_slice[(df_time_slice["cancellation_reason_comments"].notnull()) & (df_time_slice["cancellation_reason_comments"] != "")]
-df_time_slice_reasons.sort_values(by="cancelled_at", inplace=True, ascending=False)
+# DataFrame for cancellation reasons
+reasons_not_empty = (df_time_slice["cancellation_reason_comments"].notnull()) \
+                    & (df_time_slice["cancellation_reason_comments"] != "")
+df_time_slice_reasons = df_time_slice.loc[reasons_not_empty]
+df_time_slice_reasons = df_time_slice_reasons.sort_values(by="cancelled_at", ascending=False)
 
 ### Cancellation Layout and Callbacks ###
 app.layout = html.Div(
@@ -86,6 +88,7 @@ app.layout = html.Div(
         ),
         dbc.Table.from_dataframe(
             df_time_slice_counts,
+            id = "table_counts",
             striped=True,
             bordered=True,
             hover=True,
@@ -95,6 +98,7 @@ app.layout = html.Div(
         '''),
         dbc.Table.from_dataframe(
             df_time_slice_reasons,
+            id = "table_reasons",
             striped=True,
             bordered=True,
             hover=True,
