@@ -56,8 +56,8 @@ df_view = df.loc[:, columns]
 df_view["cancelled_at"] = pd.to_datetime(df_view["cancelled_at"])
 
 ## DataFrame for a time slice
-cancelled_at_min = "2019-06-01"
-cancelled_at_max = "2021-07-01"
+cancelled_at_min = pd.Timestamp('now').floor('D') - pd.Timedelta(7, unit="D")
+cancelled_at_max = pd.Timestamp('today').floor('D')
 mask = (df_view["cancelled_at"] > cancelled_at_min)\
         & (df_view["cancelled_at"] < cancelled_at_max)
 df_time_slice = df_view.loc[mask]
