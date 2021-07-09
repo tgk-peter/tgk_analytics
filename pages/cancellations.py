@@ -87,7 +87,7 @@ app.layout = html.Div(
             end_date=date.today(),
         ),
         dbc.Table.from_dataframe(
-            df_time_slice_counts,
+            df = df_time_slice_counts,
             id = "table_counts",
             striped=True,
             bordered=True,
@@ -97,7 +97,7 @@ app.layout = html.Div(
             When provided, here are the cancellation reason comments:
         '''),
         dbc.Table.from_dataframe(
-            df_time_slice_reasons,
+            df = df_time_slice_reasons,
             id = "table_reasons",
             striped=True,
             bordered=True,
