@@ -46,71 +46,31 @@ while "next" in result.links:
 ## All data
 df = pd.json_normalize(total_results)
 
-## DataFrame for cancellation reason counts
-# Create a new dataframe that keeps customer id, when they cancelled,
-# the primary reason they cancelled, and the cancellation comments they left.
-columns = ["customer_id", "cancelled_at", "cancellation_reason",
-            "cancellation_reason_comments"]
-df_cancel_counts = df.loc[:, columns]
-# Convert 'cancelled_at' values to datetime format.
-df_cancel_counts["cancelled_at"] = pd.to_datetime(df_cancel_counts["cancelled_at"])
-# Time slice
-cancelled_at_min = pd.Timestamp('now').floor('D') - pd.Timedelta(7, unit="D")
-cancelled_at_max = pd.Timestamp('today').floor('D')
-date_range = (df_cancel_counts["cancelled_at"] > cancelled_at_min)\
-        & (df_cancel_counts["cancelled_at"] < cancelled_at_max)
-df_cancel_counts = df_cancel_counts.loc[date_range]
-# DataFrame for cancellation value counts and rename columns
-df_cancel_counts_2 = df_cancel_counts["cancellation_reason"].value_counts().to_frame().reset_index()
-df_cancel_counts_2.rename(columns={"index":"Reason", "cancellation_reason":"Count"}, inplace=True)
+## DataFrame for view and time slice
 
-## DataFrame for cancellation reasons
 # Create a new dataframe that keeps customer id, when they cancelled,
 # the primary reason they cancelled, and the cancellation comments they left.
 columns = ["customer_id", "cancelled_at", "cancellation_reason",
             "cancellation_reason_comments"]
-df_cancel_reasons = df.loc[:, columns]
+df_cancel = df.loc[:, columns]
 # Convert 'cancelled_at' values to datetime format.
-df_cancel_reasons["cancelled_at"] = pd.to_datetime(df_cancel_reasons["cancelled_at"])
+df_cancel["cancelled_at"] = pd.to_datetime(df_cancel["cancelled_at"])
 # Time slice
 cancelled_at_min = pd.Timestamp('now').floor('D') - pd.Timedelta(7, unit="D")
 cancelled_at_max = pd.Timestamp('today').floor('D')
-date_range = (df_cancel_reasons["cancelled_at"] > cancelled_at_min)\
-        & (df_cancel_reasons["cancelled_at"] < cancelled_at_max)
-df_cancel_reasons = df_cancel_reasons.loc[date_range]
-# Display non-empty reasons
-reasons_not_empty = (df_cancel_reasons["cancellation_reason_comments"].notnull()) \
-                    & (df_cancel_reasons["cancellation_reason_comments"] != "")
-df_cancel_reasons = df_cancel_reasons.loc[reasons_not_empty]
+date_range = (df_cancel["cancelled_at"] > cancelled_at_min)\
+        & (df_cancel["cancelled_at"] < cancelled_at_max)
+df_cancel= df_cancel.loc[date_range]
+
+## DataFrame for cancellation value counts and rename columns
+df_cancel_counts = df_cancel["cancellation_reason"].value_counts().to_frame().reset_index()
+df_cancel_counts.rename(columns={"index":"Reason", "cancellation_reason":"Count"}, inplace=True)
+
+## Dataframe for non-empty reasons
+reasons_not_empty = (df_cancel["cancellation_reason_comments"].notnull()) \
+                    & (df_cancel["cancellation_reason_comments"] != "")
+df_cancel_reasons = df_cancel.loc[reasons_not_empty]
 df_cancel_reasons = df_cancel_reasons.sort_values(by="cancelled_at", ascending=False)
-
-## View w/ relevant columns
-# Create a new dataframe that keeps customer id, when they cancelled,
-#the primary reason they cancelled, and the cancellation comments they left.
-# Convert 'cancelled_at' values to datetime format.
-#columns = ["customer_id", "cancelled_at", "cancellation_reason",
-#            "cancellation_reason_comments"]
-#df_view = df.loc[:, columns]
-#df_view["cancelled_at"] = pd.to_datetime(df_view["cancelled_at"])
-
-
-## DataFrame for a time slice
-#cancelled_at_min = pd.Timestamp('now').floor('D') - pd.Timedelta(7, unit="D")
-#cancelled_at_max = pd.Timestamp('today').floor('D')
-#mask = (df_view["cancelled_at"] > cancelled_at_min)\
-#        & (df_view["cancelled_at"] < cancelled_at_max)
-#df_time_slice = df_view.loc[mask]
-
-# DataFrame for cancellation reason counts
-#df_time_slice_counts = df_time_slice["cancellation_reason"].value_counts().to_frame().reset_index()
-#df_time_slice_counts.rename(columns={"index":"Reason", "cancellation_reason":"Count"}, inplace=True)
-#df_time_slice_counts["% of total"] = df_time_slice_counts["Count"] / df_time_slice_counts["Count"].sum()*100
-
-# DataFrame for cancellation reasons
-#reasons_not_empty = (df_time_slice["cancellation_reason_comments"].notnull()) \
-#                    & (df_time_slice["cancellation_reason_comments"] != "")
-#df_time_slice_reasons = df_time_slice.loc[reasons_not_empty]
-#df_time_slice_reasons = df_time_slice_reasons.sort_values(by="cancelled_at", ascending=False)
 
 ### Cancellation Layout and Callbacks ###
 app.layout = html.Div(
@@ -127,7 +87,7 @@ app.layout = html.Div(
             end_date=date.today(),
         ),
         dbc.Table.from_dataframe(
-            df = df_cancel_counts_2,
+            df = df_cancel_counts,
             id = "cancel_counts",
             striped=True,
             bordered=True,
