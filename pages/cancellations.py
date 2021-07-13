@@ -48,32 +48,17 @@ while "next" in result.links:
 df = pd.json_normalize(total_results)
 
 ## DataFrame for view and time slice
-'''
+
 # Create a new dataframe that keeps customer id, when they cancelled,
 # the primary reason they cancelled, and the cancellation comments they left.
+
 columns = ["customer_id", "cancelled_at", "cancellation_reason",
             "cancellation_reason_comments"]
 df_cancel = df.loc[:, columns]
 # Convert 'cancelled_at' values to datetime format.
 df_cancel["cancelled_at"] = pd.to_datetime(df_cancel["cancelled_at"])
 
-# Time slice
-cancelled_at_min = pd.Timestamp('now').floor('D') - pd.Timedelta(7, unit="D")
-cancelled_at_max = pd.Timestamp('today').floor('D')
-date_range = (df_cancel["cancelled_at"] > cancelled_at_min)\
-        & (df_cancel["cancelled_at"] < cancelled_at_max)
-df_cancel= df_cancel.loc[date_range]
 
-## DataFrame for cancellation value counts and rename columns
-df_cancel_counts = df_cancel["cancellation_reason"].value_counts().to_frame().reset_index()
-df_cancel_counts.rename(columns={"index":"Reason", "cancellation_reason":"Count"}, inplace=True)
-
-## Dataframe for non-empty reasons
-reasons_not_empty = (df_cancel["cancellation_reason_comments"].notnull()) \
-                    & (df_cancel["cancellation_reason_comments"] != "")
-df_cancel_reasons = df_cancel.loc[reasons_not_empty]
-df_cancel_reasons = df_cancel_reasons.sort_values(by="cancelled_at", ascending=False)
-'''
 ### Cancellation Layout and Callbacks ###
 app.layout = html.Div(
     children=[
@@ -130,21 +115,21 @@ def update_count_table(start_date, end_date):
 
     # Create a new dataframe that keeps customer id, when they cancelled,
     # the primary reason they cancelled, and the cancellation comments they left.
-    columns = ["customer_id", "cancelled_at", "cancellation_reason",
-                "cancellation_reason_comments"]
-    df_cancel = df.loc[:, columns]
+#    columns = ["customer_id", "cancelled_at", "cancellation_reason",
+#                "cancellation_reason_comments"]
+#    df_cancel = df.loc[:, columns]
     # Convert 'cancelled_at' values to datetime format.
-    df_cancel["cancelled_at"] = pd.to_datetime(df_cancel["cancelled_at"])
+#    df_cancel["cancelled_at"] = pd.to_datetime(df_cancel["cancelled_at"])
 
     # Time slice
     cancelled_at_min = start_date
     cancelled_at_max = end_date
     date_range = (df_cancel["cancelled_at"] > cancelled_at_min)\
             & (df_cancel["cancelled_at"] < cancelled_at_max)
-    df_cancel= df_cancel.loc[date_range]
+    df_cancel_2= df_cancel.loc[date_range]
 
     ## DataFrame for cancellation value counts and rename columns
-    df_cancel_counts = df_cancel["cancellation_reason"].value_counts().to_frame().reset_index()
+    df_cancel_counts = df_cancel_2["cancellation_reason"].value_counts().to_frame().reset_index()
     df_cancel_counts.rename(columns={"index":"Reason", "cancellation_reason":"Count"}, inplace=True)
     return dbc.Table.from_dataframe(
         df = df_cancel_counts,
@@ -170,26 +155,26 @@ def update_count_table(start_date, end_date):
     )]
 )
 def update_reason_table(start_date, end_date):
-    
+
     # Create a new dataframe that keeps customer id, when they cancelled,
     # the primary reason they cancelled, and the cancellation comments they left.
-    columns = ["customer_id", "cancelled_at", "cancellation_reason",
-                "cancellation_reason_comments"]
-    df_cancel = df.loc[:, columns]
+#    columns = ["customer_id", "cancelled_at", "cancellation_reason",
+#                "cancellation_reason_comments"]
+#    df_cancel = df.loc[:, columns]
     # Convert 'cancelled_at' values to datetime format.
-    df_cancel["cancelled_at"] = pd.to_datetime(df_cancel["cancelled_at"])
+#    df_cancel["cancelled_at"] = pd.to_datetime(df_cancel["cancelled_at"])
 
     # Time slice
     cancelled_at_min = start_date
     cancelled_at_max = end_date
     date_range = (df_cancel["cancelled_at"] > cancelled_at_min)\
             & (df_cancel["cancelled_at"] < cancelled_at_max)
-    df_cancel= df_cancel.loc[date_range]
+    df_cancel_3= df_cancel.loc[date_range]
 
     ## Dataframe for non-empty reasons
-    reasons_not_empty = (df_cancel["cancellation_reason_comments"].notnull()) \
-                        & (df_cancel["cancellation_reason_comments"] != "")
-    df_cancel_reasons = df_cancel.loc[reasons_not_empty]
+    reasons_not_empty = (df_cancel_3["cancellation_reason_comments"].notnull()) \
+                        & (df_cancel_3["cancellation_reason_comments"] != "")
+    df_cancel_reasons = df_cancel_3.loc[reasons_not_empty]
     df_cancel_reasons = df_cancel_reasons.sort_values(by="cancelled_at", ascending=False)
 
     ## Return table with DataFrame
