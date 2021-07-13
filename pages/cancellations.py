@@ -70,30 +70,14 @@ app.layout = html.Div(
             min_date_allowed=date(2019, 6, 1),
             max_date_allowed=date.today(),
             initial_visible_month=date.today(),
-#            start_date=date.today() - timedelta(days=7),
-#            end_date=date.today(),
             start_date=pd.Timestamp('now').floor('D') - pd.Timedelta(7, unit="D"),
             end_date=pd.Timestamp('today').floor('D'),
         ),
         html.Div(id="cancel_counts_container"),
-#        dbc.Table.from_dataframe(
-#            df = df_cancel_counts,
-#            id = "cancel_counts",
-#            striped=True,
-#            bordered=True,
-#            hover=True,
-#        ),
         dcc.Markdown('''
             When provided, here are the cancellation reason comments:
         '''),
         html.Div(id="cancel_reasons_container"),
-#        dbc.Table.from_dataframe(
-#            df = df_cancel_reasons,
-#            id = "cancel_reasons",
-#            striped=True,
-#            bordered=True,
-#            hover=True,
-#        ),
     ]
 )
 # Update cancel counts container with table
@@ -112,14 +96,6 @@ app.layout = html.Div(
     )]
 )
 def update_count_table(start_date, end_date):
-
-    # Create a new dataframe that keeps customer id, when they cancelled,
-    # the primary reason they cancelled, and the cancellation comments they left.
-#    columns = ["customer_id", "cancelled_at", "cancellation_reason",
-#                "cancellation_reason_comments"]
-#    df_cancel = df.loc[:, columns]
-    # Convert 'cancelled_at' values to datetime format.
-#    df_cancel["cancelled_at"] = pd.to_datetime(df_cancel["cancelled_at"])
 
     # Time slice
     cancelled_at_min = start_date
@@ -155,14 +131,6 @@ def update_count_table(start_date, end_date):
     )]
 )
 def update_reason_table(start_date, end_date):
-
-    # Create a new dataframe that keeps customer id, when they cancelled,
-    # the primary reason they cancelled, and the cancellation comments they left.
-#    columns = ["customer_id", "cancelled_at", "cancellation_reason",
-#                "cancellation_reason_comments"]
-#    df_cancel = df.loc[:, columns]
-    # Convert 'cancelled_at' values to datetime format.
-#    df_cancel["cancelled_at"] = pd.to_datetime(df_cancel["cancelled_at"])
 
     # Time slice
     cancelled_at_min = start_date
