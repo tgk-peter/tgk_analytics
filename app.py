@@ -15,5 +15,5 @@ auth = dash_auth.BasicAuth(
     app,
     VALID_USERNAME_PASSWORD_PAIRS,
 )
-# Uncomment at deployment 
+# Uncomment at deployment
 #server = app.server

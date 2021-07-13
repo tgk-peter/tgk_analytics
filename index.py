@@ -7,7 +7,7 @@ from dash.dependencies import Input, Output
 
 ### Import Dash Instance and Pages ###
 from app import app
-from pages import page_1, page_2, meal_tag
+from pages import page_1, page_2, meal_tag, cancellations
 
 ### Page container ###
 page_container = html.Div(
@@ -46,6 +46,11 @@ index_layout = dbc.Jumbotron(
             children='Go to Meal Tagging',
             href='/meal-tag',
         ),
+        html.Br(),
+        dcc.Link(
+            children='Go to Cancellations',
+            href='/cancellations',
+        ),
     ]
 )
 
@@ -57,6 +62,7 @@ app.validation_layout = html.Div(
         page_1.layout,
         page_2.layout,
         meal_tag.layout,
+        cancellations.layout,
     ]
 )
 
@@ -76,6 +82,7 @@ def display_page(pathname):
         "/" : index_layout,
         "/page-1" : page_1.layout,
         "/page-2" : page_2.layout,
-        "/meal-tag" : meal_tag.layout
+        "/meal-tag" : meal_tag.layout,
+        "/cancellations" : cancellations.layout,
     }
     return switcher.get(pathname, "404")

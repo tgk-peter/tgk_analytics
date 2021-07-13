@@ -13,11 +13,11 @@ from datetime import date, timedelta, datetime as dt
 from config import recharge_api_token
 
 ### Import Dash Instance ###
-#from app import app
+from app import app
 
 ### Dash instance ###
-external_stylesheets = [dbc.themes.UNITED]
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+#external_stylesheets = [dbc.themes.UNITED]
+#app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 ### Access and Store Cancelled Subscriptions from Recharge ###
 # Set request variables
@@ -62,7 +62,8 @@ df_cancel = df.loc[:, columns]
 df_cancel["cancelled_at"] = pd.to_datetime(df_cancel["cancelled_at"])
 
 ### Cancellation Layout and Callbacks ###
-app.layout = html.Div(
+#app.
+layout = html.Div(
     children=[
         html.H1(
             children='Cancellations',
@@ -157,5 +158,5 @@ def update_reason_table(start_date, end_date):
     )
 
 ### Development Server
-if __name__ == '__main__':
-    app.run_server(debug=True)
+#if __name__ == '__main__':
+#    app.run_server(debug=True)
