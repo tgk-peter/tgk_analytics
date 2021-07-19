@@ -3,10 +3,13 @@ import dash
 import dash_auth
 import dash_bootstrap_components as dbc
 
-# REMOVE AT DEPLOYMENT
-VALID_USERNAME_PASSWORD_PAIRS = {
-    'hello': 'world'
-}
+### Import .env variables
+from dotenv import load_dotenv
+import os
+load_dotenv()  # take environment variables from .env
+dash_username = os.getenv('DASH_USERNAME')
+dash_password = os.getenv('DASH_PASSWORD')
+VALID_USERNAME_PASSWORD_PAIRS = {dash_username:dash_password}
 
 ### Dash instance ###
 external_stylesheets = [dbc.themes.UNITED]
