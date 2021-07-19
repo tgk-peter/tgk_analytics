@@ -10,7 +10,11 @@ import time
 import pandas as pd
 from datetime import date, timedelta, datetime as dt
 
-from config import recharge_api_token
+### Import environment variables
+from dotenv import load_dotenv
+import os
+load_dotenv()  # take environment variables from .env
+RECHARGE_API_TOKEN = os.getenv('RECHARGE_API_TOKEN')
 
 ### Import Dash Instance ###
 from app import app
@@ -21,7 +25,7 @@ from app import app
 
 ### Access and Store Cancelled Subscriptions from Recharge ###
 # Set request variables
-headers = {"X-Recharge-Access-Token": recharge_api_token}
+headers = {"X-Recharge-Access-Token": RECHARGE_API_TOKEN}
 status = "CANCELLED"
 limit = 250
 
