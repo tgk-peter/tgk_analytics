@@ -10,7 +10,7 @@ import time
 import pandas as pd
 from datetime import date, timedelta, datetime as dt
 
-### Import environment variables
+### Import .env variables
 from dotenv import load_dotenv
 import os
 load_dotenv()  # take environment variables from .env
