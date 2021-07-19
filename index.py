@@ -6,7 +6,11 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 
 ### Import Dash Instance and Pages ###
+# Import server so Procfile runs
+from app import server
+# Import Dash app
 from app import app
+# Import pages
 from pages import page_1, page_2, meal_tag, cancellations
 
 ### Page container ###
