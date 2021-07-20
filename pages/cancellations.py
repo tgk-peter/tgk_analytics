@@ -28,8 +28,8 @@ limit = 250
 # Access and store first page of results
 
 # Keep results short for testing. Uncomment when done.
-url = f"https://api.rechargeapps.com/subscriptions?status={status}&limit={limit}"
-#url = f"https://api.rechargeapps.com/subscriptions?status={status}&limit={limit}&created_at_min=2021-03-01"
+#url = f"https://api.rechargeapps.com/subscriptions?status={status}&limit={limit}"
+url = f"https://api.rechargeapps.com/subscriptions?status={status}&limit={limit}&created_at_min=2021-03-01"
 
 result = requests.get(url, headers=headers)
 result_data = result.json()
