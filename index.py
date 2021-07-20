@@ -11,7 +11,7 @@ from app import server
 # Import Dash app
 from app import app
 # Import pages
-from pages import page_1, page_2, meal_tag, cancellations
+from pages import meal_tag, cancellations
 
 ### Page container ###
 page_container = html.Div(
