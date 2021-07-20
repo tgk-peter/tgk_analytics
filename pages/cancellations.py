@@ -19,10 +19,6 @@ RECHARGE_API_TOKEN = os.getenv('RECHARGE_API_TOKEN')
 ### Import Dash Instance ###
 from app import app
 
-### Dash instance ###
-#external_stylesheets = [dbc.themes.UNITED]
-#app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-
 ### Access and Store Cancelled Subscriptions from Recharge ###
 # Set request variables
 headers = {"X-Recharge-Access-Token": RECHARGE_API_TOKEN}
@@ -66,7 +62,6 @@ df_cancel = df.loc[:, columns]
 df_cancel["cancelled_at"] = pd.to_datetime(df_cancel["cancelled_at"])
 
 ### Cancellation Layout and Callbacks ###
-#app.
 layout = html.Div(
     children=[
         html.H1(
@@ -160,7 +155,3 @@ def update_reason_table(start_date, end_date):
         bordered=True,
         hover=True,
     )
-
-### Development Server
-#if __name__ == '__main__':
-#    app.run_server(debug=True)
