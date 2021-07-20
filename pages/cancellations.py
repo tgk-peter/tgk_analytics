@@ -77,6 +77,7 @@ layout = html.Div(
         ),
         html.Div(id="cancel_counts_container"),
         dcc.Markdown('''
+            # Cancellation Reasons
             When provided, here are the cancellation reason comments:
         '''),
         html.Div(id="cancel_reasons_container"),
