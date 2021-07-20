@@ -36,15 +36,6 @@ index_layout = dbc.Jumbotron(
             children="Welcome to TGK Analytics",
             className="display-4",
         ),
-        dcc.Link(
-            children='Go to Page 1',
-            href='/page-1',
-        ),
-        html.Br(),
-        dcc.Link(
-            children='Go to Page 2',
-            href='/page-2',
-        ),
         html.Br(),
         dcc.Link(
             children='Go to Meal Tagging',
@@ -63,8 +54,6 @@ app.validation_layout = html.Div(
     children = [
         page_container,
         index_layout,
-        page_1.layout,
-        page_2.layout,
         meal_tag.layout,
         cancellations.layout,
     ]
@@ -84,8 +73,6 @@ app.validation_layout = html.Div(
 def display_page(pathname):
     switcher = {
         "/" : index_layout,
-        "/page-1" : page_1.layout,
-        "/page-2" : page_2.layout,
         "/meal-tag" : meal_tag.layout,
         "/cancellations" : cancellations.layout,
     }
