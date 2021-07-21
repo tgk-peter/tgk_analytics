@@ -52,10 +52,10 @@ df = pd.json_normalize(total_results)
 
 ## DataFrame for view and time slice
 
-# Create a new dataframe that keeps customer id, when they cancelled,
+# Create a new dataframe that keeps customer email, when they cancelled,
 # the primary reason they cancelled, and the cancellation comments they left.
 
-columns = ["customer_id", "cancelled_at", "cancellation_reason",
+columns = ["email", "cancelled_at", "cancellation_reason",
             "cancellation_reason_comments"]
 df_cancel = df.loc[:, columns]
 # Convert 'cancelled_at' values to datetime format.
