@@ -77,25 +77,46 @@ layout = html.Div(
         ),
         dbc.Card(
             children=[
-                dbc.CardHeader(
-                    children=[
-                        "Cancellation Counts"
-                    ],
-                ),
                 dbc.CardBody(
                     children=[
-                        html.Div(id="cancel_counts_container"),
+                        html.H4(
+                            children=[
+                                "Cancellation Counts"
+                            ],
+                            className='card-title',
+                        ),
+                        html.Div(
+                            id="cancel_counts_container",
+                        ),
                     ],
                 ),
             ],
             color='secondary',
             outline=True,
         ),
-        dcc.Markdown('''
-            # Cancellation Reasons
-            When provided, here are the cancellation reason comments:
-        '''),
-        html.Div(id="cancel_reasons_container"),
+        dbc.Card(
+            children=[
+                dbc.CardBody(
+                    children=[
+                        html.H4(
+                            children=[
+                                'Cancellation Reason Comments'
+                            ],
+                            className='card-title',
+                        ),
+                        html.P(
+                            children=[
+                                'When provided, here are the cancellation reason comments:'
+                            ],
+                            className='card-text',
+                        ),
+                        html.Div(id="cancel_reasons_container"),
+                    ],
+                ),
+            ],
+            color='secondary',
+            outline=True,
+        ),
         dcc.Markdown('''
             # Customers by Cancellation Reason
         '''),
