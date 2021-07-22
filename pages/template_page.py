@@ -18,7 +18,7 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 #from app import app
 
 ### Page 1 Layout and Callback ###
-# delete next line when ready to link to index page
+# delete 'app.' when ready to link to index page
 app.layout = html.Div(
     children=[
         html.H1(
