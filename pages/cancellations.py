@@ -81,6 +81,15 @@ layout = html.Div(
             When provided, here are the cancellation reason comments:
         '''),
         html.Div(id="cancel_reasons_container"),
+        dcc.Markdown('''
+            # Customers by Cancellation Reason
+        '''),
+        dcc.Dropdown(
+            id='reason-dropdown',
+            options=[{'label': i, 'value': i} for i in df_cancel['cancellation_reason'].unique()],
+            placeholder='Select a reason',
+        ),
+        html.Div(id="customers_by_reason_container"),
     ]
 )
 # Update cancel counts container with table
@@ -152,6 +161,48 @@ def update_reason_table(start_date, end_date):
     return dbc.Table.from_dataframe(
         df = df_cancel_reasons,
         id = "cancel_reasons",
+        striped=True,
+        bordered=True,
+        hover=True,
+    )
+
+# Update customers by cancel reason table
+@app.callback(
+    Output(
+        component_id='customers_by_reason_container',
+        component_property='children',
+    ),
+    [Input(
+        component_id='date-picker-range',
+        component_property='start_date',
+    ),
+    Input(
+        component_id='date-picker-range',
+        component_property='end_date',
+    ),
+    Input(
+        component_id='reason-dropdown',
+        component_property='value',
+    )]
+)
+def update_customer_by_reason_table(start_date, end_date, reason):
+
+    # Time slice
+    cancelled_at_min = start_date
+    cancelled_at_max = end_date
+    date_range = (df_cancel["cancelled_at"] > cancelled_at_min)\
+            & (df_cancel["cancelled_at"] < cancelled_at_max)
+    df_cancel_4= df_cancel.loc[date_range]
+
+    ## Dataframe for customers by reason
+    reason = df_cancel_4["cancellation_reason"] == reason
+    df_cancel_customers = df_cancel_4.loc[reason]
+    df_cancel_customers = df_cancel_customers.sort_values(by="cancelled_at", ascending=False)
+
+    ## Return table with DataFrame
+    return dbc.Table.from_dataframe(
+        df = df_cancel_customers,
+        id = "cancel_customers",
         striped=True,
         bordered=True,
         hover=True,
