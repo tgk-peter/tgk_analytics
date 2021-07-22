@@ -75,7 +75,22 @@ layout = html.Div(
             start_date=pd.Timestamp('now').floor('D') - pd.Timedelta(7, unit="D"),
             end_date=pd.Timestamp('today').floor('D'),
         ),
-        html.Div(id="cancel_counts_container"),
+        dbc.Card(
+            children=[
+                dbc.CardHeader(
+                    children=[
+                        "Cancellation Counts"
+                    ],
+                ),
+                dbc.CardBody(
+                    children=[
+                        html.Div(id="cancel_counts_container"),
+                    ],
+                ),
+            ],
+            color='secondary',
+            outline=True,
+        ),
         dcc.Markdown('''
             # Cancellation Reasons
             When provided, here are the cancellation reason comments:
