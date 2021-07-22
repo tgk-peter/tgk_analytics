@@ -14,7 +14,7 @@ from app import app
 from pages import meal_tag, cancellations
 
 ### Page container ###
-page_container = html.Div(
+page_container = dbc.Container(
     children=[
         # represents the URL bar, doesn't render anything
         dcc.Location(
