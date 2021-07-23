@@ -177,6 +177,7 @@ def update_count_table(start_date, end_date):
         striped=True,
         bordered=True,
         hover=True,
+        responsive=True,
     )
 
 # Update cancel reasons table
@@ -216,6 +217,7 @@ def update_reason_table(start_date, end_date):
         striped=True,
         bordered=True,
         hover=True,
+        responsive=True,
     )
 
 # Update customers by cancel reason table
@@ -249,6 +251,7 @@ def update_customer_by_reason_table(start_date, end_date, reason):
     ## Dataframe for customers by reason
     reason = df_cancel_4["cancellation_reason"] == reason
     df_cancel_customers = df_cancel_4.loc[reason]
+    df_cancel_customers = df_cancel_customers.loc[:, ["email", "cancelled_at", "cancellation_reason"]]
     df_cancel_customers = df_cancel_customers.sort_values(by="cancelled_at", ascending=False)
 
     ## Return table with DataFrame
@@ -258,4 +261,5 @@ def update_customer_by_reason_table(start_date, end_date, reason):
         striped=True,
         bordered=True,
         hover=True,
+        responsive=True,
     )
