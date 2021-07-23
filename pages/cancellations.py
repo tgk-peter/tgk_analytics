@@ -74,6 +74,7 @@ layout = html.Div(
             initial_visible_month=date.today(),
             start_date=pd.Timestamp('now').floor('D') - pd.Timedelta(7, unit="D"),
             end_date=pd.Timestamp('today').floor('D'),
+            className='mb-3',
         ),
         dbc.Card(
             children=[
