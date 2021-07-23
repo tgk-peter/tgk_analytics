@@ -93,6 +93,7 @@ layout = html.Div(
             ],
             color='secondary',
             outline=True,
+            className='mb-3',
         ),
         dbc.Card(
             children=[
@@ -116,16 +117,31 @@ layout = html.Div(
             ],
             color='secondary',
             outline=True,
+            className='mb-3',
         ),
-        dcc.Markdown('''
-            # Customers by Cancellation Reason
-        '''),
-        dcc.Dropdown(
-            id='reason-dropdown',
-            options=[{'label': i, 'value': i} for i in df_cancel['cancellation_reason'].unique()],
-            placeholder='Select a reason',
+        dbc.Card(
+            children=[
+                dbc.CardBody(
+                    children=[
+                        html.H4(
+                            children=[
+                                'Customers by Cancellation Reason',
+                            ],
+                            className='card-title',
+                        ),
+                        dcc.Dropdown(
+                            id='reason-dropdown',
+                            options=[{'label': i, 'value': i} for i in df_cancel['cancellation_reason'].unique()],
+                            placeholder='Select a reason',
+                        ),
+                        html.Div(id="customers_by_reason_container"),
+                    ],
+                ),
+            ],
+            color='secondary',
+            outline=True,
+            className='mb-3',
         ),
-        html.Div(id="customers_by_reason_container"),
     ]
 )
 # Update cancel counts container with table
