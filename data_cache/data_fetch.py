@@ -56,5 +56,4 @@ df_cancel['cancelled_at'] = pd.to_datetime(df_cancel['cancelled_at'])
 df_cancel['cancellation_reason'].fillna('None', inplace=True)
 
 ## Encrypt and store the df
-#encrypt_dir = '/content/drive/MyDrive/Colab Notebooks/analytics_dash/data'
 crp.to_encrypted(df_cancel, password=CRP_PASSWORD, path='cancel_sub_cache.crypt')
