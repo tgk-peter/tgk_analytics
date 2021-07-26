@@ -5,12 +5,14 @@ import requests
 import json
 import time
 import pandas as pd
+import cryptpandas as crp
 
 ### Import .env variables
 from dotenv import load_dotenv
 import os
 load_dotenv()  # take environment variables from .env
 RECHARGE_API_TOKEN = os.getenv('RECHARGE_API_TOKEN')
+CRP_PASSWORD = os.getenv('CRP_PASSWORD')
 
 ### Access and Store Cancelled Subscriptions from Recharge ###
 # Set request variables
@@ -21,6 +23,7 @@ limit = 250
 # Access and store first page of results
 
 # Keep results short for testing. Uncomment when done.
+
 #url = f"https://api.rechargeapps.com/subscriptions?status={status}&limit={limit}"
 url = f"https://api.rechargeapps.com/subscriptions?status={status}&limit={limit}&created_at_min=2021-06-01"
 
@@ -38,8 +41,19 @@ while "next" in result.links:
   if result.headers['X-Recharge-Limit'] == '39/40':
     time.sleep(0.5)
 
-### Create DataFrames ###
+### Create, encrypt, store dataFrames ###
 
-## All data
+## Create df from json results
 df = pd.json_normalize(total_results)
-print(df.head())
+
+## Slice a new dataframe that keeps customer email, when they cancelled,
+## the primary reason they cancelled, and the cancellation comments they left.
+columns = ["email", "cancelled_at", "cancellation_reason",
+            "cancellation_reason_comments"]
+df_cancel = df.loc[:, columns]
+# Convert 'cancelled_at' values to datetime format.
+df_cancel["cancelled_at"] = pd.to_datetime(df_cancel["cancelled_at"])
+
+## Encrypt and store the df
+#encrypt_dir = '/content/drive/MyDrive/Colab Notebooks/analytics_dash/data'
+crp.to_encrypted(df_cancel, password=CRP_PASSWORD, path='cancel_sub_cache.crypt')
