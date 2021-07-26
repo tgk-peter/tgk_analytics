@@ -23,7 +23,7 @@ from app import app
 # Decrypt and load cancelled subscription dataframe
 df_cancel = crp.read_encrypted(path='data_cache/cancel_sub_cache.crypt', password=CRP_PASSWORD)
 
-### Cancellation Layout and Callbacks ###
+### Cancellation Layout ###
 layout = html.Div(
     children=[
         html.H1(
@@ -118,7 +118,17 @@ layout = html.Div(
         ),
     ]
 )
-# Update cancel counts container with table
+### Cancellation Callbacks ###
+## Function to slice by time
+def time_slice(start_date, end_date):
+    cancelled_at_min = start_date
+    cancelled_at_max = end_date
+    date_range = (df_cancel["cancelled_at"] > cancelled_at_min)\
+            & (df_cancel["cancelled_at"] < cancelled_at_max)
+    df_cancel_slice = df_cancel.loc[date_range]
+    return df_cancel_slice
+
+## Update cancel counts container with table
 @app.callback(
     Output(
         component_id='cancel_counts_container',
@@ -134,16 +144,8 @@ layout = html.Div(
     )]
 )
 def update_count_table(start_date, end_date):
-
-    # Time slice
-    cancelled_at_min = start_date
-    cancelled_at_max = end_date
-    date_range = (df_cancel["cancelled_at"] > cancelled_at_min)\
-            & (df_cancel["cancelled_at"] < cancelled_at_max)
-    df_cancel_2= df_cancel.loc[date_range]
-
-    ## DataFrame for cancellation value counts and rename columns
-    df_cancel_counts = df_cancel_2["cancellation_reason"].value_counts().to_frame().reset_index()
+    df_cancel_slice = time_slice(start_date, end_date)
+    df_cancel_counts = df_cancel_slice["cancellation_reason"].value_counts().to_frame().reset_index()
     df_cancel_counts.rename(columns={"index":"Reason", "cancellation_reason":"Count"}, inplace=True)
     return dbc.Table.from_dataframe(
         df = df_cancel_counts,
@@ -154,7 +156,7 @@ def update_count_table(start_date, end_date):
         responsive=True,
     )
 
-# Update cancel reasons table
+## Update cancel reasons table
 @app.callback(
     Output(
         component_id='cancel_reasons_container',
@@ -170,18 +172,12 @@ def update_count_table(start_date, end_date):
     )]
 )
 def update_reason_table(start_date, end_date):
-
-    # Time slice
-    cancelled_at_min = start_date
-    cancelled_at_max = end_date
-    date_range = (df_cancel["cancelled_at"] > cancelled_at_min)\
-            & (df_cancel["cancelled_at"] < cancelled_at_max)
-    df_cancel_3= df_cancel.loc[date_range]
+    df_cancel_slice = time_slice(start_date, end_date)
 
     ## Dataframe for non-empty reasons
-    reasons_not_empty = (df_cancel_3["cancellation_reason_comments"].notnull()) \
-                        & (df_cancel_3["cancellation_reason_comments"] != "")
-    df_cancel_reasons = df_cancel_3.loc[reasons_not_empty]
+    reasons_not_empty = (df_cancel_slice["cancellation_reason_comments"].notnull()) \
+                        & (df_cancel_slice["cancellation_reason_comments"] != "")
+    df_cancel_reasons = df_cancel_slice.loc[reasons_not_empty]
     df_cancel_reasons = df_cancel_reasons.sort_values(by="cancelled_at", ascending=False)
 
     ## Return table with DataFrame
@@ -194,7 +190,7 @@ def update_reason_table(start_date, end_date):
         responsive=True,
     )
 
-# Update customers by cancel reason table
+## Update customers by cancel reason table
 @app.callback(
     Output(
         component_id='customers_by_reason_container',
@@ -214,17 +210,11 @@ def update_reason_table(start_date, end_date):
     )]
 )
 def update_customer_by_reason_table(start_date, end_date, reason):
-
-    # Time slice
-    cancelled_at_min = start_date
-    cancelled_at_max = end_date
-    date_range = (df_cancel["cancelled_at"] > cancelled_at_min)\
-            & (df_cancel["cancelled_at"] < cancelled_at_max)
-    df_cancel_4= df_cancel.loc[date_range]
+    df_cancel_slice = time_slice(start_date, end_date)
 
     ## Dataframe for customers by reason
-    reason = df_cancel_4["cancellation_reason"] == reason
-    df_cancel_customers = df_cancel_4.loc[reason]
+    reason = df_cancel_slice["cancellation_reason"] == reason
+    df_cancel_customers = df_cancel_slice.loc[reason]
     df_cancel_customers = df_cancel_customers.loc[:, ["email", "cancelled_at", "cancellation_reason"]]
     df_cancel_customers = df_cancel_customers.sort_values(by="cancelled_at", ascending=False)
 
