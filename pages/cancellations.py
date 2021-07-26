@@ -9,57 +9,61 @@ import json
 import time
 import pandas as pd
 from datetime import date, timedelta, datetime as dt
+import cryptpandas as crp
 
 ### Import .env variables
 from dotenv import load_dotenv
 import os
 load_dotenv()  # take environment variables from .env
-RECHARGE_API_TOKEN = os.getenv('RECHARGE_API_TOKEN')
+CRP_PASSWORD = os.getenv('CRP_PASSWORD')
 
 ### Import Dash Instance ###
 from app import app
 
 ### Access and Store Cancelled Subscriptions from Recharge ###
 # Set request variables
-headers = {"X-Recharge-Access-Token": RECHARGE_API_TOKEN}
-status = "CANCELLED"
-limit = 250
+#headers = {"X-Recharge-Access-Token": RECHARGE_API_TOKEN}
+#status = "CANCELLED"
+#limit = 250
 
 # Access and store first page of results
 
 # Keep results short for testing. Uncomment when done.
 #url = f"https://api.rechargeapps.com/subscriptions?status={status}&limit={limit}"
-url = f"https://api.rechargeapps.com/subscriptions?status={status}&limit={limit}&created_at_min=2021-03-01"
+#url = f"https://api.rechargeapps.com/subscriptions?status={status}&limit={limit}&created_at_min=2021-03-01"
 
-result = requests.get(url, headers=headers)
-result_data = result.json()
-total_results = result_data['subscriptions']
+#result = requests.get(url, headers=headers)
+#result_data = result.json()
+#total_results = result_data['subscriptions']
 
 # While Next Link is present, access and store next page
-while "next" in result.links:
-  next_url = result.links["next"]["url"]
-  result = requests.get(next_url, headers=headers)
-  result_data = result.json()
-  total_results.extend(result_data['subscriptions'])
-  # Sleep to avoid rate limit if approach threshold
-  if result.headers['X-Recharge-Limit'] == '39/40':
-    time.sleep(0.5)
+#while "next" in result.links:
+#  next_url = result.links["next"]["url"]
+#  result = requests.get(next_url, headers=headers)
+#  result_data = result.json()
+#  total_results.extend(result_data['subscriptions'])
+#  # Sleep to avoid rate limit if approach threshold
+#  if result.headers['X-Recharge-Limit'] == '39/40':
+#    time.sleep(0.5)
 
 ### Create DataFrames ###
 
 ## All data
-df = pd.json_normalize(total_results)
+#df = pd.json_normalize(total_results)
 
 ## DataFrame for view and time slice
 
 # Create a new dataframe that keeps customer email, when they cancelled,
 # the primary reason they cancelled, and the cancellation comments they left.
 
-columns = ["email", "cancelled_at", "cancellation_reason",
-            "cancellation_reason_comments"]
-df_cancel = df.loc[:, columns]
+#columns = ["email", "cancelled_at", "cancellation_reason",
+#            "cancellation_reason_comments"]
+#df_cancel = df.loc[:, columns]
 # Convert 'cancelled_at' values to datetime format.
-df_cancel["cancelled_at"] = pd.to_datetime(df_cancel["cancelled_at"])
+#df_cancel["cancelled_at"] = pd.to_datetime(df_cancel["cancelled_at"])
+
+# Decrypt and load cancelled subscription dataframe
+df_cancel = crp.read_encrypted(path='data_cache/cancel_sub_cache.crypt', password=CRP_PASSWORD)
 
 ### Cancellation Layout and Callbacks ###
 layout = html.Div(
