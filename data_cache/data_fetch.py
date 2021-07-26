@@ -25,7 +25,6 @@ limit = 250
 # Keep results short for testing. Uncomment when done.
 
 url = f'https://api.rechargeapps.com/subscriptions?status={status}&limit={limit}'
-#url = f'https://api.rechargeapps.com/subscriptions?status={status}&limit={limit}&created_at_min=2021-06-01'
 
 result = requests.get(url, headers=headers)
 result_data = result.json()
