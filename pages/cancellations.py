@@ -48,8 +48,13 @@ layout = html.Div(
                             ],
                             className='card-title',
                         ),
-                        html.Div(
-                            id="cancel_counts_container",
+                        dbc.Spinner(
+                            children=[
+                                html.Div(
+                                    id="cancel_counts_container",
+                                ),
+                            ],
+                            color='primary',
                         ),
                     ],
                 ),
@@ -98,7 +103,12 @@ layout = html.Div(
                             placeholder='Select a reason',
                             className='mb-2',
                         ),
-                        html.Div(id="customers_by_reason_container"),
+                        dbc.Spinner(
+                            children=[
+                                html.Div(id="customers_by_reason_container"),
+                            ],
+                            color='primary',
+                        ),
                     ],
                 ),
             ],
