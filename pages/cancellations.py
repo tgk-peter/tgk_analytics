@@ -48,6 +48,15 @@ layout = html.Div(
                             ],
                             className='card-title',
                         ),
+                        html.P(
+                            children=[
+                                "This table contains information for all \
+                                cancelled subscriptions within the selected \
+                                date range. It shows a list of each cancellation \
+                                reason and the number of times it occured."
+                            ],
+                            className='card-text'
+                        ),
                         dbc.Spinner(
                             children=[
                                 html.Div(
@@ -75,7 +84,10 @@ layout = html.Div(
                         ),
                         html.P(
                             children=[
-                                'When provided, here are the cancellation reason comments:'
+                                'All customers are required to enter a \
+                                cancellation reason. They can optionally leave \
+                                a cancellation comment. When provided, here are \
+                                the cancellation reason comments:'
                             ],
                             className='card-text',
                         ),
@@ -96,6 +108,14 @@ layout = html.Div(
                                 'Customers by Cancellation Reason',
                             ],
                             className='card-title',
+                        ),
+                        html.P(
+                            children=[
+                                'This table lists all of the customers that \
+                                indicated a particular cancellation reason \
+                                when they cancelled.'
+                            ],
+                            className='card-text',
                         ),
                         dcc.Dropdown(
                             id='reason-dropdown',
