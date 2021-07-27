@@ -29,15 +29,33 @@ layout = html.Div(
         html.H1(
             children='Cancellations',
         ),
-        dcc.DatePickerRange(
-            id='date-picker-range',
-            min_date_allowed=date(2019, 6, 1),
-            max_date_allowed=date.today(),
-            initial_visible_month=date.today(),
-            start_date=pd.Timestamp('now').floor('D') - pd.Timedelta(7, unit="D"),
-            end_date=pd.Timestamp('today').floor('D'),
-            className='mb-3',
+        dbc.Row(
+            children=[
+                dbc.Col(
+                    children=[
+                        dcc.DatePickerRange(
+                            id='date-picker-range',
+                            min_date_allowed=date(2019, 6, 1),
+                            max_date_allowed=date.today(),
+                            initial_visible_month=date.today(),
+                            start_date=pd.Timestamp('now').floor('D') - pd.Timedelta(7, unit="D"),
+                            end_date=pd.Timestamp('today').floor('D'),
+                            className='mb-3',
+                        ),
+                    ],
+                ),
+                dbc.Col(
+                    children=[
+                        html.Div(
+                            children='Total Cancellations = 50',
+                            id='cancel_total_box',
+                            className='border p-3',
+                        ),
+                    ],
+                ),
+            ],
         ),
+
         dbc.Card(
             children=[
                 dbc.CardBody(
