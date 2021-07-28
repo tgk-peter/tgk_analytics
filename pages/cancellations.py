@@ -4,6 +4,8 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
+from dash_extensions import Download
+from dash_extensions.snippets import send_data_frame
 import requests
 import json
 import time
@@ -106,9 +108,20 @@ layout = html.Div(
                                 'All customers are required to enter a \
                                 cancellation reason. They can optionally leave \
                                 a cancellation comment. When provided, here are \
-                                the cancellation reason comments:'
+                                the cancellation reason comments.'
                             ],
                             className='card-text',
+                        ),
+                        dbc.Button(
+                            children=[
+                                'Download CSV'
+                            ],
+                            id='btn_reason_csv',
+                            color='primary',
+                            className='mb-3',
+                        ),
+                        Download(
+                            id='download_reason_csv',
                         ),
                         html.Div(id="cancel_reasons_container"),
                     ],
@@ -249,6 +262,15 @@ def update_reason_table(start_date, end_date):
         hover=True,
         responsive=True,
     )
+
+## Cancel reasons download csv
+@app.callback(
+    Output("download_reason_csv", "data"),
+    Input("btn_reason_csv", "n_clicks"),
+    prevent_initial_call=True,
+)
+def download_reason_csv(n_clicks):
+    return send_data_frame(df_cancel_reasons.to_csv, "mydf.csv")
 
 ## Update customers by cancel reason table
 @app.callback(
