@@ -265,11 +265,33 @@ def update_reason_table(start_date, end_date):
 
 ## Cancel reasons download csv
 @app.callback(
-    Output("download_reason_csv", "data"),
-    Input("btn_reason_csv", "n_clicks"),
+    Output(
+        component_id='download_reason_csv',
+        component_property='data',
+    ),
+    [Input(
+        component_id='date-picker-range',
+        component_property='start_date',
+    ),
+    Input(
+        component_id='date-picker-range',
+        component_property='end_date',
+    ),
+    Input(
+        component_id='btn_reason_csv',
+        component_property='n_clicks',
+    )],
     prevent_initial_call=True,
 )
-def download_reason_csv(n_clicks):
+def download_reason_csv(start_date, end_date, n_clicks):
+    df_cancel_slice = time_slice(start_date, end_date)
+
+    ## Dataframe for non-empty reasons
+    reasons_not_empty = (df_cancel_slice["cancellation_reason_comments"].notnull()) \
+                            & (df_cancel_slice["cancellation_reason_comments"] != "")
+    df_cancel_reasons = df_cancel_slice.loc[reasons_not_empty]
+    df_cancel_reasons = df_cancel_reasons.sort_values(by="cancelled_at", ascending=False)
+
     return send_data_frame(df_cancel_reasons.to_csv, "mydf.csv")
 
 ## Update customers by cancel reason table
