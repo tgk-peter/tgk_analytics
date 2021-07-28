@@ -48,15 +48,15 @@ layout = html.Div(
                         html.Div(
                             children='',
                             id='cancel_total_box',
+                            className='pt-2',
                         ),
                     ],
                     width='auto',
                     className='border',
                 ),
             ],
-            className='mb-3',
+            className='mb-3 mr-1',
         ),
-
         dbc.Card(
             children=[
                 dbc.CardBody(
@@ -138,7 +138,8 @@ layout = html.Div(
                         ),
                         dcc.Dropdown(
                             id='reason-dropdown',
-                            options=[{'label': i, 'value': i} for i in df_cancel['cancellation_reason'].unique()],
+                            options=[{'label': i, 'value': i} for i in df_cancel \
+                            ['cancellation_reason'].unique()],
                             placeholder='Select a reason',
                             className='mb-2',
                         ),
@@ -186,10 +187,6 @@ def update_total_cancels(start_date, end_date):
     df_cancel_slice = time_slice(start_date, end_date)
     df_cancel_total = df_cancel_slice["cancellation_reason"].value_counts().sum()
     return html.H5(f'Total Cancellations = {df_cancel_total}')
-#    return dcc.Markdown('''
-#        Total Cancellations = [cancel_total]
-#        [cancel_total]: cancel_total
-#    ''')
 
 ## Update cancel counts container with table
 @app.callback(
