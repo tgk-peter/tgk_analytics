@@ -40,20 +40,21 @@ layout = html.Div(
                             initial_visible_month=date.today(),
                             start_date=pd.Timestamp('now').floor('D') - pd.Timedelta(7, unit="D"),
                             end_date=pd.Timestamp('today').floor('D'),
-                            className='mb-3',
                         ),
                     ],
                 ),
                 dbc.Col(
                     children=[
                         html.Div(
-                            children='Total Cancellations = 50',
+                            children='',
                             id='cancel_total_box',
-                            className='border p-3',
                         ),
                     ],
+                    width='auto',
+                    className='border',
                 ),
             ],
+            className='mb-3',
         ),
 
         dbc.Card(
@@ -165,6 +166,30 @@ def time_slice(start_date, end_date):
             & (df_cancel["cancelled_at"] < cancelled_at_max)
     df_cancel_slice = df_cancel.loc[date_range]
     return df_cancel_slice
+
+## Update cancellation total display
+@app.callback(
+    Output(
+        component_id='cancel_total_box',
+        component_property='children',
+    ),
+    [Input(
+        component_id='date-picker-range',
+        component_property='start_date',
+    ),
+    Input(
+        component_id='date-picker-range',
+        component_property='end_date',
+    )]
+)
+def update_total_cancels(start_date, end_date):
+    df_cancel_slice = time_slice(start_date, end_date)
+    df_cancel_total = df_cancel_slice["cancellation_reason"].value_counts().sum()
+    return html.H5(f'Total Cancellations = {df_cancel_total}')
+#    return dcc.Markdown('''
+#        Total Cancellations = [cancel_total]
+#        [cancel_total]: cancel_total
+#    ''')
 
 ## Update cancel counts container with table
 @app.callback(
