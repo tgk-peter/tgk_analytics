@@ -4,6 +4,8 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
+from dash_extensions import Download
+from dash_extensions.snippets import send_data_frame
 import requests
 import json
 import time
@@ -106,9 +108,20 @@ layout = html.Div(
                                 'All customers are required to enter a \
                                 cancellation reason. They can optionally leave \
                                 a cancellation comment. When provided, here are \
-                                the cancellation reason comments:'
+                                the cancellation reason comments.'
                             ],
                             className='card-text',
+                        ),
+                        dbc.Button(
+                            children=[
+                                'Download CSV'
+                            ],
+                            id='btn_reason_csv',
+                            color='primary',
+                            className='mb-3',
+                        ),
+                        Download(
+                            id='download_reason_csv',
                         ),
                         html.Div(id="cancel_reasons_container"),
                     ],
@@ -249,6 +262,37 @@ def update_reason_table(start_date, end_date):
         hover=True,
         responsive=True,
     )
+
+## Cancel reasons download csv
+@app.callback(
+    Output(
+        component_id='download_reason_csv',
+        component_property='data',
+    ),
+    [Input(
+        component_id='date-picker-range',
+        component_property='start_date',
+    ),
+    Input(
+        component_id='date-picker-range',
+        component_property='end_date',
+    ),
+    Input(
+        component_id='btn_reason_csv',
+        component_property='n_clicks',
+    )],
+    prevent_initial_call=True,
+)
+def download_reason_csv(start_date, end_date, n_clicks):
+    df_cancel_slice = time_slice(start_date, end_date)
+
+    ## Dataframe for non-empty reasons
+    reasons_not_empty = (df_cancel_slice["cancellation_reason_comments"].notnull()) \
+                            & (df_cancel_slice["cancellation_reason_comments"] != "")
+    df_cancel_reasons = df_cancel_slice.loc[reasons_not_empty]
+    df_cancel_reasons = df_cancel_reasons.sort_values(by="cancelled_at", ascending=False)
+
+    return send_data_frame(df_cancel_reasons.to_csv, f"cancel_comments_{start_date}_{end_date}.csv")
 
 ## Update customers by cancel reason table
 @app.callback(
