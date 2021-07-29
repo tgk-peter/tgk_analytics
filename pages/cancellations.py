@@ -292,7 +292,7 @@ def download_reason_csv(start_date, end_date, n_clicks):
     df_cancel_reasons = df_cancel_slice.loc[reasons_not_empty]
     df_cancel_reasons = df_cancel_reasons.sort_values(by="cancelled_at", ascending=False)
 
-    return send_data_frame(df_cancel_reasons.to_csv, "mydf.csv")
+    return send_data_frame(df_cancel_reasons.to_csv, f"cancel_comments_{start_date}_{end_date}.csv")
 
 ## Update customers by cancel reason table
 @app.callback(
