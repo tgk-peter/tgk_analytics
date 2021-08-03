@@ -7,6 +7,12 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 
+### Import .env variables
+from dotenv import load_dotenv
+import os
+load_dotenv()  # take environment variables from .env
+CRP_PASSWORD = os.getenv('CRP_PASSWORD')
+
 ### Dash instance ###
 # For isolated development purposes only, remove this section when ready
 # to link to index
@@ -17,7 +23,7 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 # Uncomment when ready to link to index page
 #from app import app
 
-### Page 1 Layout and Callback ###
+### Page 1 Layout ###
 # delete 'app.' when ready to link to index page
 app.layout = html.Div(
     children=[
@@ -35,6 +41,7 @@ app.layout = html.Div(
     ]
 )
 
+### Page 1 Callbacks ###
 @app.callback(
     Output(
         component_id='page-1-content',
