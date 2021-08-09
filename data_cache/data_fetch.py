@@ -56,4 +56,4 @@ df_cancel['cancelled_at'] = pd.to_datetime(df_cancel['cancelled_at'])
 df_cancel['cancellation_reason'].fillna('None', inplace=True)
 
 ## Encrypt and store the df
-crp.to_encrypted(df_cancel, password=CRP_PASSWORD, path='cancel_sub_cache.crypt')
+crp.to_encrypted(df_cancel, password=CRP_PASSWORD, path='data_cache/cancel_sub_cache.crypt')
