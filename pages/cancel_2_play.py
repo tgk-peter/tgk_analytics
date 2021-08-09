@@ -15,4 +15,5 @@ indx = [
 
 df_mock = pd.DataFrame(mock, index = indx)
 
-print(df_mock)
+dates = {k:v for (k,v) in enumerate(df_mock.index)}
+print(dates)

@@ -45,16 +45,6 @@ df_mock = pd.DataFrame(mock, index = indx)
 ### Cancellation 2 Layout ###
 # delete 'app.' when ready to link to index page
 
-# layout components
-date_picker = dcc.DatePickerRange(
-    id='date-picker-range',
-    min_date_allowed=date(2019, 6, 1),
-    max_date_allowed=date.today(),
-    initial_visible_month=date.today(),
-    start_date=pd.Timestamp('now').floor('D') - pd.Timedelta(7, unit="D"),
-    end_date=pd.Timestamp('today').floor('D'),
-)
-
 count_fig = px.line(
     data_frame=df_mock,
     title = 'Cancellation Counts Over Time',
@@ -79,6 +69,14 @@ checklist = dbc.FormGroup(
     ]
 )
 
+month_slider = dcc.RangeSlider(
+    min=0,
+    max=len(df_mock.index) - 1,
+    step=None,
+    marks={k:v for (k, v) in enumerate(df_mock.index)},
+    value=[0, len(df_mock.index) - 1],
+)
+
 # Layout
 app.layout = html.Div(
     children=[
@@ -89,11 +87,11 @@ app.layout = html.Div(
             children=[
                 dbc.Col(
                     children=[
-                        date_picker,
+                        month_slider,
                     ],
                 )
             ],
-            className = 'mb-3'
+            className = 'border mb-3 p-5',
         ),
         dbc.Row(
             children=[
@@ -103,7 +101,7 @@ app.layout = html.Div(
                     ],
                 )
             ],
-            className='border',
+            className='border mb-3',
         ),
         dbc.Row(
             children=[
@@ -113,6 +111,7 @@ app.layout = html.Div(
                     ],
                 )
             ],
+            className = 'border mb-3',
         ),
     ]
 )
