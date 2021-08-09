@@ -70,6 +70,7 @@ checklist = dbc.FormGroup(
 )
 
 month_slider = dcc.RangeSlider(
+    id='month_slider',
     min=0,
     max=len(df_mock.index) - 1,
     step=None,
@@ -93,11 +94,17 @@ app.layout = html.Div(
             ],
             className = 'border mb-3 p-5',
         ),
+        html.Div(
+            id='rangeslider_out'
+        ),
         dbc.Row(
             children=[
                 dbc.Col(
                     children=[
-                        dcc.Graph(figure=count_fig),
+                        dcc.Graph(
+                            id='count_graph',
+                            figure=count_fig,
+                        ),
                     ],
                 )
             ],
@@ -115,21 +122,23 @@ app.layout = html.Div(
         ),
     ]
 )
-'''
+
 ### Page 1 Callbacks ###
 @app.callback(
     Output(
-        component_id='page-1-content',
+        component_id='rangeslider_out',
         component_property='children',
     ),
     [Input(
-        component_id='page-1-dropdown',
+        component_id='month_slider',
         component_property='value',
     )]
 )
 def page_1_dropdown(value):
-    return 'You have selected "{}"'.format(value)
-'''
+    start_month = value[0]
+    end_month = value[-1]
+    return f'Start month is {start_month} and end month is {end_month}.'
+
 ### Development Server
 # For isolated development purposes only, remove this section when ready
 # to link to index
