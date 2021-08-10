@@ -13,7 +13,7 @@ GITHUB_ACCESS_TOKEN = os.getenv('GITHUB_ACCESS_TOKEN')
 github = Github(GITHUB_ACCESS_TOKEN)
 
 # Get all of the contents of the repository recursively
-def get_contents():
+def get_all_repo_contents():
     repo = github.get_user().get_repo("tgk_analytics")
     contents = repo.get_contents("")
     while contents:
@@ -28,9 +28,23 @@ def get_branches():
     repo = github.get_user().get_repo("tgk_analytics")
     print(list(repo.get_branches()))
 
+# Get file content
+def get_file_content():
+    repo = github.get_user().get_repo("tgk_analytics")
+    contents = repo.get_contents("data_cache/git_store_test.txt")
+    print(contents.decoded_content.decode())
 
-# next feature
-file_path = 'pages/'
+
+# Update a file in the repository
+def update_file_content():
+    repo = github.get_user().get_repo("tgk_analytics")
+    contents = repo.get_contents("data_cache/git_store_test.txt")
+    repo.update_file(
+        path=contents.path,
+        message='next commit',
+        content='The time is 3:22p',
+        sha=contents.sha,
+    )
 
 
-get_contents()
+update_file_content()
