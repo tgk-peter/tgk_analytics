@@ -41,7 +41,7 @@ def update_file_content():
     contents = repo.get_contents("data_cache/git_store_test.txt")
     repo.update_file(
         path=contents.path,
-        message='next commit',
+        message='3:22p commit',
         content='The time is 3:22p',
         sha=contents.sha,
     )
