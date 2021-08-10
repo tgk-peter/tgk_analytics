@@ -38,7 +38,7 @@ indx = [
     'February 2021',
     'March 2021',
     'April 2021',
-    'May 2021'
+    'May 2021',
 ]
 
 df_counts = pd.DataFrame(data, index = indx)
