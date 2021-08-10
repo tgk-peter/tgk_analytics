@@ -45,6 +45,3 @@ def update_file_content():
         content='The time is 3:22p',
         sha=contents.sha,
     )
-
-
-update_file_content()
