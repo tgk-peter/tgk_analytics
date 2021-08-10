@@ -28,8 +28,9 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 #from app import app
 
 data = {
-    'Too Many Meals' : [95, 75, 85, 65, 60],
-    'Not Happy with Quality' : [80, 90, 45, 55, 75],
+    'Too Many Meals': [95, 75, 85, 65, 60],
+    'Not Happy with Quality': [80, 90, 45, 55, 75],
+    'Other': [106, 77, 92, 74, 65],
 }
 
 indx = [
@@ -79,6 +80,7 @@ checklist = dbc.FormGroup(
             options=[
                 {"label": "Too Many Meals", "value": 1},
                 {"label": "Not Happy with Quality", "value": 2},
+                {"label": "Other", "value": 3},
             ],
             value=[1],
             id="checklist-input",
@@ -162,7 +164,7 @@ app.layout = html.Div(
         ),
     ]
 )
-
+'''
 ### Page 1 Callbacks ###
 @app.callback(
     Output(
@@ -178,7 +180,7 @@ def page_1_dropdown(value):
     start_month = value[0]
     end_month = value[-1]
     return f'Start month is {start_month} and end month is {end_month}.'
-
+'''
 ### Development Server
 # For isolated development purposes only, remove this section when ready
 # to link to index
