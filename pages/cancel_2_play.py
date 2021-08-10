@@ -16,4 +16,8 @@ indx = [
 df_mock = pd.DataFrame(mock, index = indx)
 
 dates = {k:v for (k,v) in enumerate(df_mock.index)}
-print(dates)
+print(df_mock)
+
+#print(df_mock.sum(axis=1))
+
+print(df_mock.div(df_mock.sum(axis=1), axis=0))

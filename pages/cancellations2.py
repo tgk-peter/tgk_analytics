@@ -27,7 +27,7 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 # Uncomment when ready to link to index page
 #from app import app
 
-mock = {
+data = {
     'Too Many Meals' : [95, 75, 85, 65, 60],
     'Not Happy with Quality' : [80, 90, 45, 55, 75],
 }
@@ -40,19 +40,36 @@ indx = [
     'May 2021'
 ]
 
-df_mock = pd.DataFrame(mock, index = indx)
+df_counts = pd.DataFrame(data, index = indx)
+
+df_normalize = df_counts.div(df_counts.sum(axis=1), axis=0)
+
+df_normalize_2 = df_normalize.transpose()
 
 ### Cancellation 2 Layout ###
 # delete 'app.' when ready to link to index page
 
 count_fig = px.line(
-    data_frame=df_mock,
+    data_frame=df_counts,
     title = 'Cancellation Counts Over Time',
     labels = {
         'value': 'Cancellations',
         'index': 'Month',
         'variable': 'Reason',
     },
+)
+
+normalize_fig = px.bar(
+    data_frame=df_normalize,
+)
+
+normalize_table = dbc.Table.from_dataframe(
+    df = df_normalize_2.reset_index(),
+    id = "normalize_table",
+    striped=True,
+    bordered=True,
+    hover=True,
+    responsive=True,
 )
 
 checklist = dbc.FormGroup(
@@ -72,10 +89,10 @@ checklist = dbc.FormGroup(
 month_slider = dcc.RangeSlider(
     id='month_slider',
     min=0,
-    max=len(df_mock.index) - 1,
+    max=len(df_counts.index) - 1,
     step=None,
-    marks={k:v for (k, v) in enumerate(df_mock.index)},
-    value=[0, len(df_mock.index) - 1],
+    marks={k:v for (k, v) in enumerate(df_counts.index)},
+    value=[0, len(df_counts.index) - 1],
 )
 
 # Layout
@@ -115,6 +132,29 @@ app.layout = html.Div(
                 dbc.Col(
                     children=[
                         checklist,
+                    ],
+                )
+            ],
+            className = 'border mb-3',
+        ),
+        dbc.Row(
+            children=[
+                dbc.Col(
+                    children=[
+                        dcc.Graph(
+                            id='normalize_graph',
+                            figure=normalize_fig,
+                        ),
+                    ],
+                )
+            ],
+            className='border mb-3',
+        ),
+        dbc.Row(
+            children=[
+                dbc.Col(
+                    children=[
+                        normalize_table,
                     ],
                 )
             ],
