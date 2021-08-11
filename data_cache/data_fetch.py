@@ -1,4 +1,5 @@
-# data_fetch.py = fetch and store data from APIs
+# data_fetch.py
+# fetch data from APIs. Store on github.
 
 ### Import Packages ###
 import requests
@@ -6,6 +7,7 @@ import json
 import time
 import pandas as pd
 import cryptpandas as crp
+from github import Github
 
 ### Import .env variables
 from dotenv import load_dotenv
@@ -13,6 +15,7 @@ import os
 load_dotenv()  # take environment variables from .env
 RECHARGE_API_TOKEN = os.getenv('RECHARGE_API_TOKEN')
 CRP_PASSWORD = os.getenv('CRP_PASSWORD')
+GITHUB_ACCESS_TOKEN = os.getenv('GITHUB_ACCESS_TOKEN')
 
 ### Access and Store Cancelled Subscriptions from Recharge ###
 # Set request variables
@@ -55,5 +58,18 @@ df_cancel['cancelled_at'] = pd.to_datetime(df_cancel['cancelled_at'])
 # Replace null in 'cancellation_reason' with 'None'
 df_cancel['cancellation_reason'].fillna('None', inplace=True)
 
-## Encrypt and store the df
+## Encrypt and store the df locally
 crp.to_encrypted(df_cancel, password=CRP_PASSWORD, path='data_cache/cancel_sub_cache.crypt')
+
+# Read file content and update in github repository
+with open('cancel_sub_cache.crypt') as file:
+    file_content = file.read()
+github = Github(GITHUB_ACCESS_TOKEN)
+repo = github.get_user().get_repo("tgk_analytics")
+contents = repo.get_contents("data_cache/cancel_sub_cache.crypt")
+repo.update_file(
+    path=contents.path,
+    message='next commit',
+    content=file_content,
+    sha=contents.sha,
+)
