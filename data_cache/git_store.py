@@ -49,5 +49,12 @@ def update_file_content():
 # Read file content and update a file in the repository
 def update_file_content_2():
     with open('git_store_test.txt') as file:
-        content = file.read()
-    print(content)
+        file_content = file.read()
+    repo = github.get_user().get_repo("tgk_analytics")
+    contents = repo.get_contents("data_cache/git_store_test.txt")
+    repo.update_file(
+        path=contents.path,
+        message='next commit',
+        content=file_content,
+        sha=contents.sha,
+    )
