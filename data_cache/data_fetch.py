@@ -62,7 +62,7 @@ df_cancel['cancellation_reason'].fillna('None', inplace=True)
 crp.to_encrypted(df_cancel, password=CRP_PASSWORD, path='data_cache/cancel_sub_cache.crypt')
 
 # Read file content and update in github repository
-with open('cancel_sub_cache.crypt') as file:
+with open('data_cache/cancel_sub_cache.crypt') as file:
     file_content = file.read()
 github = Github(GITHUB_ACCESS_TOKEN)
 repo = github.get_user().get_repo("tgk_analytics")
