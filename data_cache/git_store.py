@@ -45,3 +45,9 @@ def update_file_content():
         content='The time is 3:22p',
         sha=contents.sha,
     )
+
+# Read file content and update a file in the repository
+def update_file_content_2():
+    with open('git_store_test.txt') as file:
+        content = file.read()
+    print(content)
