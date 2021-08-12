@@ -1,5 +1,9 @@
 # data_fetch.py
-# fetch data from APIs. Store on github.
+# Cache data from Recharge API to reduce execution time in Dash app.
+
+###############
+### IMPORTS ###
+###############
 
 ### Import Packages ###
 import requests
@@ -9,7 +13,7 @@ import pandas as pd
 import cryptpandas as crp
 from github import Github
 
-### Import .env variables
+### Import .env variables ###
 from dotenv import load_dotenv
 import os
 load_dotenv()  # take environment variables from .env
@@ -17,59 +21,91 @@ RECHARGE_API_TOKEN = os.getenv('RECHARGE_API_TOKEN')
 CRP_PASSWORD = os.getenv('CRP_PASSWORD')
 GITHUB_ACCESS_TOKEN = os.getenv('GITHUB_ACCESS_TOKEN')
 
-### Access and Store Cancelled Subscriptions from Recharge ###
-# Set request variables
-headers = {'X-Recharge-Access-Token': RECHARGE_API_TOKEN}
-status = 'CANCELLED'
-limit = 250
+###############################################
+### Get Data from Recharge Subscription API ###
+###############################################
 
-# Access and store first page of results
+def get_recharge_sub_api(status):
+    '''Request and hold paginated data from the Recharge Subscription API
 
-# Keep results short for testing. Uncomment when done.
+    Keyword arguments:
+    status -- that status of the subscription ('ACTIVE', 'CANCELLED', 'EXPIRED')
+    '''
+    # Set request variables
+    headers = {'X-Recharge-Access-Token': RECHARGE_API_TOKEN}
+    status = status
+    limit = 250
 
-url = f'https://api.rechargeapps.com/subscriptions?status={status}&limit={limit}'
+    # Access and store first page of subscription results
+    url = f'https://api.rechargeapps.com/subscriptions?\
+    status={status}&limit={limit}'
+    response = requests.get(url, headers=headers)
+    response_data = response.json()
+    all_records = response_data['subscriptions']
 
-result = requests.get(url, headers=headers)
-result_data = result.json()
-total_results = result_data['subscriptions']
+    # While Next Link is present, access and store next page
+    while 'next' in response.links:
+      next_url = response.links['next']['url']
+      response = requests.get(next_url, headers=headers)
+      response_data = response.json()
+      all_records.extend(response_data['subscriptions'])
+      # Sleep to avoid rate limit if approach threshold
+      if response.headers['X-Recharge-Limit'] == '39/40':
+        time.sleep(0.5)
 
-# While Next Link is present, access and store next page
-while 'next' in result.links:
-  next_url = result.links['next']['url']
-  result = requests.get(next_url, headers=headers)
-  result_data = result.json()
-  total_results.extend(result_data['subscriptions'])
-  # Sleep to avoid rate limit if approach threshold
-  if result.headers['X-Recharge-Limit'] == '39/40':
-    time.sleep(0.5)
+    return all_records
 
-### Create, encrypt, store dataFrames ###
+def generate_dataframe(records, path):
+    '''Create, encrypt, store cancellation DataFrame
 
-## Create df from json results
-df = pd.json_normalize(total_results)
+    Keyword arguments:
+    records -- dictionary of records from API
+    path -- file path to write encrypted DataFrame
+    '''
+    ## Create df from json results
+    df = pd.json_normalize(records)
 
-## Slice a new dataframe that keeps customer email, when they cancelled,
-## the primary reason they cancelled, and the cancellation comments they left.
-columns = ['email', 'cancelled_at', 'cancellation_reason',
-            'cancellation_reason_comments']
-df_cancel = df.loc[:, columns]
-# Convert 'cancelled_at' values to datetime format.
-df_cancel['cancelled_at'] = pd.to_datetime(df_cancel['cancelled_at'])
-# Replace null in 'cancellation_reason' with 'None'
-df_cancel['cancellation_reason'].fillna('None', inplace=True)
+    # Keep columns customer email, when they cancelled,
+    # the primary reason they cancelled, cancellation comments left.
+    # RESOLVE: encryption fails on full dataframe
+    columns = ['email', 'cancelled_at', 'cancellation_reason',
+                'cancellation_reason_comments']
+    df_cancel = df.loc[:, columns]
+    # Convert 'cancelled_at' values to datetime format.
+    df_cancel['cancelled_at'] = pd.to_datetime(df_cancel['cancelled_at'])
+    # Replace null in 'cancellation_reason' with 'None'
+    df_cancel['cancellation_reason'].fillna('None', inplace=True)
 
-## Encrypt and store the df locally
-crp.to_encrypted(df_cancel, password=CRP_PASSWORD, path='data_cache/cancel_sub_cache.crypt')
+    # Encrypt and store the df locally
+    crp.to_encrypted(df_cancel, password=CRP_PASSWORD, \
+    path=path)
 
-# Read file content and update in github repository
-with open('data_cache/cancel_sub_cache.crypt') as file:
-    file_content = file.read()
-github = Github(GITHUB_ACCESS_TOKEN)
-repo = github.get_user().get_repo("tgk_analytics")
-contents = repo.get_contents("data_cache/cancel_sub_cache.crypt")
-repo.update_file(
-    path=contents.path,
-    message='next commit',
-    content=file_content,
-    sha=contents.sha,
+def github_update(file_path):
+    '''Read file content and update in github repository
+
+    Keyword arguments:
+    file_path -- path of file to read and update
+    '''
+    with open(file_path) as file:
+        file_content = file.read()
+    github = Github(GITHUB_ACCESS_TOKEN)
+    repo = github.get_user().get_repo("tgk_analytics")
+    contents = repo.get_contents(file_path)
+    repo.update_file(
+        path=contents.path,
+        message='next commit',
+        content=file_content,
+        sha=contents.sha,
+    )
+
+### Get all cancelled subscriptions ###
+cancellation_records = get_recharge_sub_api(
+    status = 'CANCELLED',
+)
+generate_dataframe(
+    records = cancellation_records,
+    path = 'data_cache/cancel_sub_cache.crypt',
+)
+github_update(
+    file_path = 'data_cache/cancel_sub_cache.crypt',
 )
