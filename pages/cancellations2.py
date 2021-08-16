@@ -20,12 +20,12 @@ CRP_PASSWORD = os.getenv('CRP_PASSWORD')
 ### Dash instance ###
 # For isolated development purposes only, remove this section when ready
 # to link to index
-external_stylesheets = [dbc.themes.UNITED]
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+# external_stylesheets = [dbc.themes.UNITED]
+# app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 ### Import Dash Instance ###
 # Uncomment when ready to link to index page
-#from app import app
+from app import app
 
 data = {
     'Too Many Meals': [95, 75, 85, 65, 60],
@@ -98,7 +98,7 @@ month_slider = dcc.RangeSlider(
 )
 
 # Layout
-app.layout = html.Div(
+layout = html.Div(
     children=[
         html.H1(
             children='Cancellations 2',
@@ -184,5 +184,5 @@ def page_1_dropdown(value):
 ### Development Server
 # For isolated development purposes only, remove this section when ready
 # to link to index
-if __name__ == '__main__':
-    app.run_server(debug=True)
+# if __name__ == '__main__':
+#     app.run_server(debug=True)
