@@ -6,9 +6,6 @@ from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 from dash_extensions import Download
 from dash_extensions.snippets import send_data_frame
-import requests
-import json
-import time
 import pandas as pd
 from datetime import date, timedelta, datetime as dt
 import cryptpandas as crp
