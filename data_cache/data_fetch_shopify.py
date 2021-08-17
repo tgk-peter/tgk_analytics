@@ -1,5 +1,5 @@
-# data_fetch.py
-# Cache data from Recharge API to reduce execution time in Dash app.
+# data_fetch_shopify.py
+# Cache data from Shopify API to reduce execution time in Dash app.
 
 ###############
 ### IMPORTS ###
@@ -17,9 +17,8 @@ from github import Github
 from dotenv import load_dotenv
 import os
 load_dotenv()  # take environment variables from .env
-RECHARGE_API_TOKEN = os.getenv('RECHARGE_API_TOKEN')
 CRP_PASSWORD = os.getenv('CRP_PASSWORD')
-GITHUB_ACCESS_TOKEN = os.getenv('GITHUB_ACCESS_TOKEN')
+SHOPIFY_PASSWORD = os.getenv('SHOPIFY_PASSWORD')
 
 ###############################################
 ### Get Data from Shopify Order API ###
@@ -41,9 +40,10 @@ def get_shopify_order_api(endpoint, status):
     endpoint = endpoint
     status = status
     limit = 250
+    created_at_min = "2021-06-10T14:31:59-04:00"
 
     # Access and store first page of results
-    url = f"https://{shop}/{endpoint}?status={status}&limit={limit}"
+    url = f"https://{shop}/{endpoint}?status={status}&limit={limit}&created_at_min={created_at_min}"
     response = requests.get(url, headers=headers)
     response_data = response.json()
     all_records = response_data['orders']
@@ -61,29 +61,28 @@ def get_shopify_order_api(endpoint, status):
 
 #########
 
-def generate_cancellation_df(records, path):
+def generate_active_order_df(records, path):
     '''Create, encrypt, store cancellation DataFrame
 
     Keyword arguments:
     records -- dictionary of records from API
     path -- file path to write encrypted DataFrame
     '''
-    ## Create df from json results
-    df = pd.json_normalize(records)
 
-    # Keep columns customer email, when they cancelled,
-    # the primary reason they cancelled, cancellation comments left.
-    # RESOLVE: encryption fails on full dataframe
-    columns = ['email', 'cancelled_at', 'cancellation_reason',
-                'cancellation_reason_comments']
-    df_cancel = df.loc[:, columns]
-    # Convert 'cancelled_at' values to datetime format.
-    df_cancel['cancelled_at'] = pd.to_datetime(df_cancel['cancelled_at'])
-    # Replace null in 'cancellation_reason' with 'None'
-    df_cancel['cancellation_reason'].fillna('None', inplace=True)
+    # Generate df from json and trim it to target
+    # Keep active (non-cancelled) subscription orders.
+    # Keep customer email, order number, order creation date,
+    # subscription sku, and cancelled_at date.
+    # Convert created_at to datetime
+    df_orders_sub = pd.json_normalize(records, record_path='line_items', \
+                            meta=['email', 'order_number', 'created_at', 'cancelled_at'])
+    df_orders_sub = df_orders_sub.loc[:, ['email', 'order_number', 'created_at', 'sku', 'cancelled_at']]
+    df_orders_sub['created_at'] = pd.to_datetime(df_orders_sub['created_at'])
+    df_orders_sub = df_orders_sub[df_orders_sub['sku'].str.contains('SUB')]
+    df_orders_sub = df_orders_sub[df_orders_sub['cancelled_at'].isnull()]
 
     # Encrypt and store the df locally
-    crp.to_encrypted(df_cancel, password=CRP_PASSWORD, \
+    crp.to_encrypted(df_orders_sub, password=CRP_PASSWORD, \
     path=path)
 
 def github_update(file_path):
@@ -104,20 +103,15 @@ def github_update(file_path):
         sha=contents.sha,
     )
 
-### Get all cancelled subscriptions ###
-cancellation_records = get_recharge_sub_api(
-    status='CANCELLED',
-)
-generate_cancellation_df(
-    records=cancellation_records,
-    path='data_cache/cancel_sub_cache.crypt',
-)
-github_update(
-    file_path='data_cache/cancel_sub_cache.crypt',
-)
-
 ### Get all active Shopify orders ###
 active_orders = get_shopify_order_api(
     endpoint= 'admin/api/2021-07/orders.json',
     status='any',
 )
+generate_active_order_df(
+    records=active_orders,
+    path='data_cache/active_order_cache.crypt',
+)
+# github_update(
+#     file_path='data_cache/active_order_cache.crypt',
+# )
