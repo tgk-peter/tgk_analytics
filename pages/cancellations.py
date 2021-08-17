@@ -20,9 +20,20 @@ CRP_PASSWORD = os.getenv('CRP_PASSWORD')
 from app import app
 
 # Decrypt and load cancelled subscription dataframe
-df_cancel = crp.read_encrypted(path='data_cache/cancel_sub_cache.crypt', password=CRP_PASSWORD)
+df_cancel = crp.read_encrypted(path='data_cache/cancel_sub_cache.crypt', \
+            password=CRP_PASSWORD)
 
 ### Cancellation Layout ###
+datepicker_range = dcc.DatePickerRange(
+    id='date-picker-range',
+    min_date_allowed=date(2019, 6, 1),
+    max_date_allowed=date.today(),
+    initial_visible_month=date.today(),
+    start_date=pd.Timestamp('now').floor('D') - pd.Timedelta(7, unit="D"),
+    end_date=pd.Timestamp('today').floor('D'),
+)
+
+
 layout = html.Div(
     children=[
         html.H1(
@@ -32,14 +43,7 @@ layout = html.Div(
             children=[
                 dbc.Col(
                     children=[
-                        dcc.DatePickerRange(
-                            id='date-picker-range',
-                            min_date_allowed=date(2019, 6, 1),
-                            max_date_allowed=date.today(),
-                            initial_visible_month=date.today(),
-                            start_date=pd.Timestamp('now').floor('D') - pd.Timedelta(7, unit="D"),
-                            end_date=pd.Timestamp('today').floor('D'),
-                        ),
+                        datepicker_range,
                     ],
                 ),
                 dbc.Col(
@@ -171,12 +175,27 @@ layout = html.Div(
 ### Cancellation Callbacks ###
 ## Function to slice by time
 def time_slice(start_date, end_date):
+    '''Filter DataFrame by date range
+
+    Keyword arguments:
+    start_date -- beginning of date range
+    end_date -- end of date range
+    '''
     cancelled_at_min = start_date
     cancelled_at_max = end_date
     date_range = (df_cancel["cancelled_at"] > cancelled_at_min)\
             & (df_cancel["cancelled_at"] < cancelled_at_max)
     df_cancel_slice = df_cancel.loc[date_range]
     return df_cancel_slice
+
+def df_non_empty(df_cancel_slice):
+    ''' Create DataFrame for non-empty reasons
+    '''
+    reasons_not_empty = (df_cancel_slice["cancellation_reason_comments"].notnull()) \
+                        & (df_cancel_slice["cancellation_reason_comments"] != "")
+    df_cancel_reasons = df_cancel_slice.loc[reasons_not_empty]
+    df_cancel_reasons = df_cancel_reasons.sort_values(by="cancelled_at", ascending=False)
+    return df_cancel_reasons
 
 ## Update cancellation total display
 @app.callback(
@@ -215,8 +234,12 @@ def update_total_cancels(start_date, end_date):
 )
 def update_count_table(start_date, end_date):
     df_cancel_slice = time_slice(start_date, end_date)
-    df_cancel_counts = df_cancel_slice["cancellation_reason"].value_counts().to_frame().reset_index()
-    df_cancel_counts.rename(columns={"index":"Reason", "cancellation_reason":"Count"}, inplace=True)
+    df_cancel_counts = df_cancel_slice["cancellation_reason"].value_counts() \
+                        .to_frame().reset_index()
+    df_cancel_counts.rename(
+        columns={"index":"Reason", "cancellation_reason":"Count"},
+        inplace=True
+    )
     return dbc.Table.from_dataframe(
         df = df_cancel_counts,
         id = "cancel_counts",
@@ -245,10 +268,7 @@ def update_reason_table(start_date, end_date):
     df_cancel_slice = time_slice(start_date, end_date)
 
     ## Dataframe for non-empty reasons
-    reasons_not_empty = (df_cancel_slice["cancellation_reason_comments"].notnull()) \
-                        & (df_cancel_slice["cancellation_reason_comments"] != "")
-    df_cancel_reasons = df_cancel_slice.loc[reasons_not_empty]
-    df_cancel_reasons = df_cancel_reasons.sort_values(by="cancelled_at", ascending=False)
+    df_cancel_reasons = df_non_empty(df_cancel_slice=df_cancel_slice)
 
     ## Return table with DataFrame
     return dbc.Table.from_dataframe(
@@ -284,12 +304,10 @@ def download_reason_csv(start_date, end_date, n_clicks):
     df_cancel_slice = time_slice(start_date, end_date)
 
     ## Dataframe for non-empty reasons
-    reasons_not_empty = (df_cancel_slice["cancellation_reason_comments"].notnull()) \
-                            & (df_cancel_slice["cancellation_reason_comments"] != "")
-    df_cancel_reasons = df_cancel_slice.loc[reasons_not_empty]
-    df_cancel_reasons = df_cancel_reasons.sort_values(by="cancelled_at", ascending=False)
+    df_cancel_reasons = df_non_empty(df_cancel_slice=df_cancel_slice)
 
-    return send_data_frame(df_cancel_reasons.to_csv, f"cancel_comments_{start_date}_{end_date}.csv")
+    return send_data_frame(df_cancel_reasons.to_csv, \
+            f"cancel_comments_{start_date}_{end_date}.csv")
 
 ## Update customers by cancel reason table
 @app.callback(
