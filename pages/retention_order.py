@@ -57,6 +57,15 @@ def df_retain_orders_columns():
 # Resample into weeks to generate absolute counts
 df_retain_orders = df_orders_agg.resample('W', on='first_order_date') \
                     .agg(df_retain_orders_columns())
+
+# Divide by customers to generate percentages
+df_retain_orders_percent = df_retain_orders.iloc[:, 2:] \
+                            .div(df_retain_orders['email'], axis=0)
+
+# Format for graph
+df_retain_graph = df_retain_orders_percent.transpose()
+
+# Format for dbc.Table
 df_retain_orders.reset_index(inplace=True)
 df_retain_orders['first_order_date'] = df_retain_orders['first_order_date'] \
                                         .dt.strftime('%b %d, %Y')
@@ -65,32 +74,22 @@ df_retain_orders.rename(
         'email':'Customers',
         'first_order_date':'First Order Week'
     },
-    inplace=True
+    inplace=True,
 )
-# Divide by customers to generate percentages
-df_retain_orders_percent = df_retain_orders.iloc[:, 2:] \
-                            .div(df_retain_orders['Customers'], axis=0)
 
-
-
-### Page 1 Layout ###
-# delete 'app.' when ready to link to index page
-week1 = go.Scatter(x=['Order 1','Order 2',' Order 3',' Order 4'], y=[.9, .6, .3, .1])
-week2 = go.Scatter(x=['Order 1','Order 2',' Order 3',' Order 4'], y=[.8, .5, .2, 0])
-week3 = go.Scatter(x=['Order 1','Order 2',' Order 3',' Order 4'], y=[.7, .4 , .1, 0])
-week4 = go.Scatter(x=['Order 1','Order 2',' Order 3',' Order 4'], y=[.6, .3 , 0, 0])
-data = [week1, week2, week3, week4]
-layout={}
-fig = go.Figure(data=data, layout=layout)
-
+# layout components
+retention_trace = px.line(
+    data_frame=df_retain_graph,
+    title='Retention by Order Count'
+)
 
 app.layout = html.Div(
     children=[
+        dcc.Graph(
+            figure=retention_trace,
+        ),
         dbc.Table.from_dataframe(df_retain_orders, striped=True, bordered=True, hover=True),
         dbc.Table.from_dataframe(df_retain_orders_percent),
-        dcc.Graph(
-            figure=fig
-        ),
         dcc.Markdown('''
             ### Discussion ##
             - customers that only have one sub over lifetime vs several
