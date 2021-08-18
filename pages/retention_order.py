@@ -112,6 +112,8 @@ retention_table_percent = DataTable(
     id='retention_table_percent',
     columns=retention_table_percent_columns,
     data=df_retain_orders_percent_table.to_dict('records'),
+    page_size=5,
+    style_cell={'textAlign': 'center'},
 )
 
 # layout #
