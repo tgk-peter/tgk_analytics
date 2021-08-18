@@ -7,6 +7,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
+import dash_table
 import pandas as pd
 import plotly.graph_objs as go
 import plotly.express as px
@@ -59,13 +60,16 @@ df_retain_orders = df_orders_agg.resample('W', on='first_order_date') \
                     .agg(df_retain_orders_columns())
 
 # Divide by customers to generate percentages
-df_retain_orders_percent = df_retain_orders.iloc[:, 2:] \
+df_retain_orders_percent = df_retain_orders.iloc[:, 1:] \
                             .div(df_retain_orders['email'], axis=0)
 
-# Format for graph
+# Format for percentage table
+df_retain_orders_percent_table = df_retain_orders_percent.reset_index()
+
+# Format for percentage graph
 df_retain_graph = df_retain_orders_percent.transpose()
 
-# Format for dbc.Table
+# Format for dbc.Table absolute
 df_retain_orders.reset_index(inplace=True)
 df_retain_orders['first_order_date'] = df_retain_orders['first_order_date'] \
                                         .dt.strftime('%b %d, %Y')
@@ -77,19 +81,55 @@ df_retain_orders.rename(
     inplace=True,
 )
 
-# layout components
+
+
+
+####################
+### Page Layout ####
+####################
+
+# layout components #
 retention_trace = px.line(
     data_frame=df_retain_graph,
-    title='Retention by Order Count'
 )
 
-app.layout = html.Div(
+retention_table_percent = dash_table.DataTable(
+    id='retention_table_percent',
+    columns=[{"name": i, "id": i} for i in df_retain_orders_percent_table.columns],
+    data=df_retain_orders_percent_table.to_dict('records'),
+)
+
+# layout #
+app.layout = dbc.Container(
     children=[
+        dbc.Row(
+            children=[
+                dbc.Col(
+                    children=[
+                        html.H1(
+                            children=[
+                                "Retention By Order Count",
+                            ],
+                        ),
+                    ],
+                ),
+            ],
+            className='mb-3',
+        ),
+        dbc.Row(
+            children=[
+                dbc.Col(
+                    children=[
+                        retention_table_percent,
+                    ],
+                ),
+            ],
+            className='border mb-3',
+        ),
         dcc.Graph(
             figure=retention_trace,
         ),
         dbc.Table.from_dataframe(df_retain_orders, striped=True, bordered=True, hover=True),
-        dbc.Table.from_dataframe(df_retain_orders_percent),
         dcc.Markdown('''
             ### Discussion ##
             - customers that only have one sub over lifetime vs several
