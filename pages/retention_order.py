@@ -2,16 +2,17 @@
 # Generate order retention cohorts for TGK customers
 
 ### Import Packages ###
+import cryptpandas as crp
 import dash
-import dash_core_components as dcc
-import dash_html_components as html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
-import dash_table
+import dash_core_components as dcc
+import dash_html_components as html
+from dash_table import DataTable
+from dash_table.Format import Format, Scheme
 import pandas as pd
-import plotly.graph_objs as go
 import plotly.express as px
-import cryptpandas as crp
+import plotly.graph_objs as go
 
 ### Import .env variables
 from dotenv import load_dotenv
@@ -65,6 +66,12 @@ df_retain_orders_percent = df_retain_orders.iloc[:, 1:] \
 
 # Format for percentage table
 df_retain_orders_percent_table = df_retain_orders_percent.reset_index()
+df_retain_orders_percent_table['first_order_date'] = \
+    df_retain_orders_percent_table['first_order_date'].dt.strftime('%b %d, %Y')
+df_retain_orders_percent_table.rename(
+    columns={'first_order_date':'First Order Week'},
+    inplace=True,
+)
 
 # Format for percentage graph
 df_retain_graph = df_retain_orders_percent.transpose()
@@ -93,9 +100,17 @@ retention_trace = px.line(
     data_frame=df_retain_graph,
 )
 
-retention_table_percent = dash_table.DataTable(
+### DataTable ###
+
+retention_table_percent_columns = \
+    [{'name': i, 'id': i} for i in df_retain_orders_percent_table.columns[0:1]] + \
+    [{'name': i, 'id': i, 'type':'numeric',
+    'format':Format(precision=0, scheme=Scheme.percentage)} \
+    for i in df_retain_orders_percent_table.columns[1:]]
+
+retention_table_percent = DataTable(
     id='retention_table_percent',
-    columns=[{"name": i, "id": i} for i in df_retain_orders_percent_table.columns],
+    columns=retention_table_percent_columns,
     data=df_retain_orders_percent_table.to_dict('records'),
 )
 
@@ -104,15 +119,7 @@ app.layout = dbc.Container(
     children=[
         dbc.Row(
             children=[
-                dbc.Col(
-                    children=[
-                        html.H1(
-                            children=[
-                                "Retention By Order Count",
-                            ],
-                        ),
-                    ],
-                ),
+                dbc.Col(html.H1("Retention By Order Count")),
             ],
             className='mb-3',
         ),
@@ -124,7 +131,7 @@ app.layout = dbc.Container(
                     ],
                 ),
             ],
-            className='border mb-3',
+            className='mb-3',
         ),
         dcc.Graph(
             figure=retention_trace,
