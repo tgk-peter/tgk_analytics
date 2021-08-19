@@ -40,7 +40,7 @@ def get_shopify_order_api(endpoint, status):
     endpoint = endpoint
     status = status
     limit = 250
-    created_at_min = "2021-06-10T14:31:59-04:00"
+    created_at_min = "2021-05-10T14:31:59-04:00"
 
     # Access and store first page of results
     url = f"https://{shop}/{endpoint}?status={status}&limit={limit}&created_at_min={created_at_min}"
