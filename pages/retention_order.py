@@ -65,11 +65,15 @@ df_retain_orders_percent = df_retain_orders.iloc[:, 1:] \
                             .div(df_retain_orders['email'], axis=0)
 
 # Format for percentage table
-df_retain_orders_percent_table = df_retain_orders_percent.reset_index()
-df_retain_orders_percent_table['first_order_date'] = \
-    df_retain_orders_percent_table['first_order_date'].dt.strftime('%b %d, %Y')
+df_retain_orders_percent_table = pd.concat([df_retain_orders['email'], df_retain_orders_percent], axis=1)
+df_retain_orders_percent_table.reset_index(inplace=True)
+#df_retain_orders_percent_table['first_order_date'] = \
+#    df_retain_orders_percent_table['first_order_date'].dt.strftime('%b %d, %Y')
 df_retain_orders_percent_table.rename(
-    columns={'first_order_date':'First Order Week'},
+    columns={
+        'email':'Customers',
+        'first_order_date':'First Order Week'
+    },
     inplace=True,
 )
 
@@ -102,21 +106,79 @@ retention_trace = px.line(
 
 ### DataTable ###
 
+# Table columns
 retention_table_percent_columns = \
-    [{'name': i, 'id': i} for i in df_retain_orders_percent_table.columns[0:1]] + \
+    [{'name': i, 'id': i} for i in df_retain_orders_percent_table.columns[0:2]] + \
     [{'name': i, 'id': i, 'type':'numeric',
     'format':Format(precision=0, scheme=Scheme.percentage)} \
-    for i in df_retain_orders_percent_table.columns[1:]]
+    for i in df_retain_orders_percent_table.columns[2:]]
 
+# conditional styling
+conditional_style_1 = [
+    {
+        'if': {
+            'filter_query': '{{{col}}} >= .8 && {{{col}}} <= 1'.format(col=col),
+            'column_id': col
+        },
+        'backgroundColor': '#045a8d',
+        'color': 'white'
+    } for col in df_retain_orders_percent_table.columns
+]
+conditional_style_2 = [
+    {
+        'if': {
+            'filter_query': '{{{col}}} >= .6 && {{{col}}} <.8'.format(col=col),
+            'column_id': col
+        },
+        'backgroundColor': '#2b8cbe',
+        'color': 'white'
+    } for col in df_retain_orders_percent_table.columns
+]
+conditional_style_3 = [
+    {
+        'if': {
+            'filter_query': '{{{col}}} >= .4 && {{{col}}} <.6'.format(col=col),
+            'column_id': col
+        },
+        'backgroundColor': '#74a9cf',
+        'color': 'white'
+    } for col in df_retain_orders_percent_table.columns
+]
+conditional_style_4 = [
+    {
+        'if': {
+            'filter_query': '{{{col}}} >= .2 && {{{col}}} <.4'.format(col=col),
+            'column_id': col
+        },
+        'backgroundColor': '#bdc9e1',
+        'color': 'white'
+    } for col in df_retain_orders_percent_table.columns
+]
+conditional_style_5 = [
+    {
+        'if': {
+            'filter_query': '{{{col}}} >= .01 && {{{col}}} <.2'.format(col=col),
+            'column_id': col
+        },
+        'backgroundColor': '#f1eef6',
+        'color': 'black'
+    } for col in df_retain_orders_percent_table.columns
+]
+conditional_style_all = conditional_style_1 + conditional_style_2 + \
+    conditional_style_3 + conditional_style_4 + conditional_style_5
+
+# Table setup
 retention_table_percent = DataTable(
     id='retention_table_percent',
     columns=retention_table_percent_columns,
     data=df_retain_orders_percent_table.to_dict('records'),
-    page_size=5,
+    page_size=8,
     style_cell={'textAlign': 'center'},
+    filter_action='native',
+    style_data_conditional= conditional_style_all
 )
 
-# layout #
+### Layout ###
 app.layout = dbc.Container(
     children=[
         dbc.Row(
@@ -129,6 +191,7 @@ app.layout = dbc.Container(
             children=[
                 dbc.Col(
                     children=[
+                        #html.Div(legend, style={'float': 'right'}),
                         retention_table_percent,
                     ],
                 ),
