@@ -186,13 +186,37 @@ app.layout = dbc.Container(
             children=[
                 dbc.Col(html.H1("Retention By Order Count")),
             ],
-            className='mb-3',
+            className='',
         ),
         dbc.Row(
             children=[
                 dbc.Col(
                     children=[
-                        #html.Div(legend, style={'float': 'right'}),
+                        dcc.Markdown('''
+                        ### Weekly Cohort Retention - Percentage
+
+                        Table shows percentage of each cohort that has placed X number of subscription orders.
+
+                        *Example:* 65 customers placed their first subscription order in the week of 2021-06-20 (Sun - Sat). 72% placed a 2nd subscription order, 38% placed a 3rd subscription order, etc.
+
+                        **Date Filtering** -
+                        Rows can be filtered by date. Enter search string and press enter to filter. To reset, delete search string and press enter.
+
+                        *Examples:*
+                        - "2021-07-04" = Select the 2021-07-04 row.
+                        - ">= 2021-06-13" = Select rows including and after 2021-06-13.
+                        - "<2021-07-04" = Select rows before 2021-07-04.
+
+                        '''),
+                    ],
+                ),
+            ],
+            className='border mb-3 py-3',
+        ),
+        dbc.Row(
+            children=[
+                dbc.Col(
+                    children=[
                         retention_table_percent,
                     ],
                 ),
@@ -203,11 +227,6 @@ app.layout = dbc.Container(
             figure=retention_trace,
         ),
         dbc.Table.from_dataframe(df_retain_orders, striped=True, bordered=True, hover=True),
-        dcc.Markdown('''
-            ### Discussion ##
-            - customers that only have one sub over lifetime vs several
-            - how to break down weekly cohorts (Mon - Sun)?
-        '''),
     ]
 )
 
