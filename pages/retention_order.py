@@ -43,7 +43,7 @@ df_orders_agg = df_orders_group.agg(
                   order_count=('order_number', 'count'),
                 )
 ## create columns to track number of orders
-for number in range(1,11):
+for number in range(2,11):
   order_number = number
   df_orders_agg[f'{order_number} Order'] = df_orders_agg['order_count'] >= order_number
 
@@ -64,11 +64,12 @@ df_retain_orders = df_orders_agg.resample('W', on='first_order_date') \
 df_retain_orders_percent = df_retain_orders.iloc[:, 1:] \
                             .div(df_retain_orders['email'], axis=0)
 
+### Format
 # Format for percentage table
 df_retain_orders_percent_table = pd.concat([df_retain_orders['email'], df_retain_orders_percent], axis=1)
 df_retain_orders_percent_table.reset_index(inplace=True)
-#df_retain_orders_percent_table['first_order_date'] = \
-#    df_retain_orders_percent_table['first_order_date'].dt.strftime('%b %d, %Y')
+df_retain_orders_percent_table['first_order_date'] = \
+    df_retain_orders_percent_table['first_order_date'].dt.strftime('%Y-%m-%d')
 df_retain_orders_percent_table.rename(
     columns={
         'email':'Customers',
@@ -83,7 +84,7 @@ df_retain_graph = df_retain_orders_percent.transpose()
 # Format for dbc.Table absolute
 df_retain_orders.reset_index(inplace=True)
 df_retain_orders['first_order_date'] = df_retain_orders['first_order_date'] \
-                                        .dt.strftime('%b %d, %Y')
+                                        .dt.strftime('%Y-%m-%d')
 df_retain_orders.rename(
     columns={
         'email':'Customers',
@@ -151,7 +152,7 @@ conditional_style_4 = [
             'column_id': col
         },
         'backgroundColor': '#bdc9e1',
-        'color': 'white'
+        'color': 'black'
     } for col in df_retain_orders_percent_table.columns
 ]
 conditional_style_5 = [
@@ -172,10 +173,10 @@ retention_table_percent = DataTable(
     id='retention_table_percent',
     columns=retention_table_percent_columns,
     data=df_retain_orders_percent_table.to_dict('records'),
-    page_size=8,
-    style_cell={'textAlign': 'center'},
+    page_size=26,
+    style_cell={'textAlign': 'center', 'fontSize':16, 'font-family':'Ubuntu'},
     filter_action='native',
-    style_data_conditional= conditional_style_all
+    style_data_conditional= conditional_style_all,
 )
 
 ### Layout ###
