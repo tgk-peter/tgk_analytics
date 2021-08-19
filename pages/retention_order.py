@@ -121,7 +121,7 @@ conditional_style_1 = [
             'filter_query': '{{{col}}} >= .8 && {{{col}}} <= 1'.format(col=col),
             'column_id': col
         },
-        'backgroundColor': '#045a8d',
+        'backgroundColor': '#a63603',
         'color': 'white'
     } for col in df_retain_orders_percent_table.columns
 ]
@@ -131,7 +131,7 @@ conditional_style_2 = [
             'filter_query': '{{{col}}} >= .6 && {{{col}}} <.8'.format(col=col),
             'column_id': col
         },
-        'backgroundColor': '#2b8cbe',
+        'backgroundColor': '#e6550d',
         'color': 'white'
     } for col in df_retain_orders_percent_table.columns
 ]
@@ -141,7 +141,7 @@ conditional_style_3 = [
             'filter_query': '{{{col}}} >= .4 && {{{col}}} <.6'.format(col=col),
             'column_id': col
         },
-        'backgroundColor': '#74a9cf',
+        'backgroundColor': '#fd8d3c',
         'color': 'white'
     } for col in df_retain_orders_percent_table.columns
 ]
@@ -151,7 +151,7 @@ conditional_style_4 = [
             'filter_query': '{{{col}}} >= .2 && {{{col}}} <.4'.format(col=col),
             'column_id': col
         },
-        'backgroundColor': '#bdc9e1',
+        'backgroundColor': '#fdbe85',
         'color': 'black'
     } for col in df_retain_orders_percent_table.columns
 ]
@@ -161,7 +161,7 @@ conditional_style_5 = [
             'filter_query': '{{{col}}} >= .01 && {{{col}}} <.2'.format(col=col),
             'column_id': col
         },
-        'backgroundColor': '#f1eef6',
+        'backgroundColor': '#feedde',
         'color': 'black'
     } for col in df_retain_orders_percent_table.columns
 ]
