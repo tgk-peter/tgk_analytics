@@ -33,25 +33,28 @@ def get_shopify_order_api(endpoint, status):
     Reference:
     https://shopify.dev/api/admin/rest/reference/orders/order
     '''
-    # Set URL variables
+    # Set URL
     headers = {"X-Shopify-Access-Token":SHOPIFY_PASSWORD, \
     "Content-Type":"application/json"}
     shop = "the-good-kitchen-esc.myshopify.com"
     endpoint = endpoint
     status = status
     limit = 250
-    created_at_min = "2021-05-10T14:31:59-04:00"
+    created_at_min = "2021-04-10T14:31:59-04:00"
+    created_at_max = "2021-05-10T14:31:59-04:00"
+    fields = 'email,order_number,created_at,cancelled_at,line_items'
+    url = f"https://{shop}/{endpoint}?fields={fields}&status={status}&limit={limit}&created_at_min={created_at_min}"
 
     # Access and store first page of results
-    url = f"https://{shop}/{endpoint}?status={status}&limit={limit}&created_at_min={created_at_min}"
-    response = requests.get(url, headers=headers)
+    session = requests.Session()
+    response = session.get(url, headers=headers)
     response_data = response.json()
     all_records = response_data['orders']
 
     # While Next Link is present, access and store next page
     while "next" in response.links:
       next_url = response.links["next"]["url"]
-      response = requests.get(next_url, headers=headers)
+      response = session.get(next_url, headers=headers)
       response_data = response.json()
       all_records.extend(response_data['orders'])
       # Sleep to avoid rate limit if approach bucket size
