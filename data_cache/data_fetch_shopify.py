@@ -42,7 +42,7 @@ def get_shopify_order_api(endpoint, status):
     limit = 250
     created_at_min = "2020-06-10T14:31:59-04:00"
     fields = 'email,order_number,created_at,cancelled_at,line_items'
-    url = f"https://{shop}/{endpoint}?fields={fields}&status={status}&limit={limit}&created_at_min={created_at_min}"
+    url = f"https://{shop}/{endpoint}?fields={fields}&status={status}&limit={limit}"
 
     # Access and store first page of results
     session = requests.Session()
