@@ -7,7 +7,6 @@
 
 ### Import Packages ###
 import requests
-import json
 import time
 import pandas as pd
 import cryptpandas as crp
@@ -19,6 +18,7 @@ import os
 load_dotenv()  # take environment variables from .env
 CRP_PASSWORD = os.getenv('CRP_PASSWORD')
 SHOPIFY_PASSWORD = os.getenv('SHOPIFY_PASSWORD')
+GITHUB_ACCESS_TOKEN = os.getenv('GITHUB_ACCESS_TOKEN')
 
 ###############################################
 ### Get Data from Shopify Order API ###
@@ -41,7 +41,6 @@ def get_shopify_order_api(endpoint, status):
     status = status
     limit = 250
     created_at_min = "2021-04-10T14:31:59-04:00"
-    created_at_max = "2021-05-10T14:31:59-04:00"
     fields = 'email,order_number,created_at,cancelled_at,line_items'
     url = f"https://{shop}/{endpoint}?fields={fields}&status={status}&limit={limit}&created_at_min={created_at_min}"
 
@@ -52,17 +51,22 @@ def get_shopify_order_api(endpoint, status):
     all_records = response_data['orders']
 
     # While Next Link is present, access and store next page
+    count = 0
     while "next" in response.links:
-      next_url = response.links["next"]["url"]
-      response = session.get(next_url, headers=headers)
-      response_data = response.json()
-      all_records.extend(response_data['orders'])
-      # Sleep to avoid rate limit if approach bucket size
-      if response.headers['X-Shopify-Shop-Api-Call-Limit'] == '79/80':
-        time.sleep(0.25)
+        next_url = response.links["next"]["url"]
+        response = session.get(next_url, headers=headers)
+        count +=1
+        print(response.headers['X-Shopify-Shop-Api-Call-Limit'], count)
+        response_data = response.json()
+        all_records.extend(response_data['orders'])
+        # Sleep to avoid rate limit if approach bucket size
+        if response.headers['X-Shopify-Shop-Api-Call-Limit'] == '79/80':
+            time.sleep(0.25)
+
     return all_records
 
 #########
+
 
 def generate_active_order_df(records, path):
     '''Create, encrypt, store cancellation DataFrame
@@ -77,10 +81,11 @@ def generate_active_order_df(records, path):
     # Keep customer email, order number, order creation date,
     # subscription sku, and cancelled_at date.
     # Convert created_at to datetime
-    df_orders_sub = pd.json_normalize(records, record_path='line_items', \
+    df_orders_sub = pd.json_normalize(records, record_path='line_items',
                             meta=['email', 'order_number', 'created_at', 'cancelled_at'])
     df_orders_sub = df_orders_sub.loc[:, ['email', 'order_number', 'created_at', 'sku', 'cancelled_at']]
     df_orders_sub['created_at'] = pd.to_datetime(df_orders_sub['created_at'])
+    df_orders_sub['sku'].fillna('No SKU', inplace=True)
     df_orders_sub = df_orders_sub[df_orders_sub['sku'].str.contains('SUB')]
     df_orders_sub = df_orders_sub[df_orders_sub['cancelled_at'].isnull()]
 
