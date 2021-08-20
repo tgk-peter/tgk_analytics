@@ -20,20 +20,21 @@ import os
 load_dotenv()  # take environment variables from .env
 CRP_PASSWORD = os.getenv('CRP_PASSWORD')
 
-### Dash instance ###
+### Dash instance ###  REMOVE
 # For isolated development purposes only, remove this section when ready
 # to link to index
-external_stylesheets = [dbc.themes.UNITED]
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+#external_stylesheets = [dbc.themes.UNITED]
+#app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+### REMOVE
 
 ### Import Dash Instance ###
 # Uncomment when ready to link to index page
-#from app import app
+from app import app
 
 ### DataFrame ###
 # Read in encrypted DataFrame
 ####REMOVE relative reference when deploy#######
-df_orders_sub = crp.read_encrypted(path='../data_cache/active_order_cache.crypt', \
+df_orders_sub = crp.read_encrypted(path='data_cache/active_order_cache.crypt', \
                 password=CRP_PASSWORD)
 
 # Groupby email and reset index. Aggregrate first order date and order count.
@@ -180,7 +181,7 @@ retention_table_percent = DataTable(
 )
 
 ### Layout ###
-app.layout = dbc.Container(
+layout = dbc.Container(
     children=[
         dbc.Row(
             children=[
@@ -249,5 +250,5 @@ def page_1_dropdown(value):
 ### Development Server
 # For isolated development purposes only, remove this section when ready
 # to link to index
-if __name__ == '__main__':
-    app.run_server(debug=True)
+# if __name__ == '__main__':
+#     app.run_server(debug=True)
