@@ -102,7 +102,7 @@ def github_update(file_path):
     with open(file_path) as file:
         file_content = file.read()
     github = Github(GITHUB_ACCESS_TOKEN)
-    repo = github.get_user().get_repo("tgk_analytics")
+    repo = github.get_user().get_repo('tgk_analytics')
     contents = repo.get_contents(file_path)
     repo.update_file(
         path=contents.path,
@@ -120,6 +120,6 @@ generate_active_order_df(
     records=active_orders,
     path='data_cache/active_order_cache.crypt',
 )
-# github_update(
-#     file_path='data_cache/active_order_cache.crypt',
-# )
+github_update(
+    file_path='data_cache/active_order_cache.crypt',
+)
