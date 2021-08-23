@@ -1,29 +1,25 @@
-#### Use as template for new pages ####
+# cancellations2.py #
+# monthly count of cancellation reasons #
 
-### Import Packages ###
-import dash
-import dash_core_components as dcc
-import dash_html_components as html
+# Import Packages #
 import dash_bootstrap_components as dbc
+import dash_core_components as dcc
 from dash.dependencies import Input, Output
+import dash_html_components as html
 import plotly.express as px
+
 import pandas as pd
 from datetime import date, timedelta, datetime as dt
 import cryptpandas as crp
 
-### Import .env variables
 from dotenv import load_dotenv
 import os
+
+# Import .env variables #
 load_dotenv()  # take environment variables from .env
 CRP_PASSWORD = os.getenv('CRP_PASSWORD')
 
-### Dash instance ###
-# For isolated development purposes only, remove this section when ready
-# to link to index
-# external_stylesheets = [dbc.themes.UNITED]
-# app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-
-### Import Dash Instance ###
+# Import Dash Instance #
 # Uncomment when ready to link to index page
 from app import app
 
@@ -41,19 +37,19 @@ indx = [
     'May 2021',
 ]
 
-df_counts = pd.DataFrame(data, index = indx)
+df_counts = pd.DataFrame(data, index=indx)
 
 df_normalize = df_counts.div(df_counts.sum(axis=1), axis=0)
 
 df_normalize_2 = df_normalize.transpose()
 
-### Cancellation 2 Layout ###
-# delete 'app.' when ready to link to index page
+# Cancellation 2 Layout #
 
+# layout components
 count_fig = px.line(
     data_frame=df_counts,
-    title = 'Cancellation Counts Over Time',
-    labels = {
+    title='Cancellation Counts Over Time',
+    labels={
         'value': 'Cancellations',
         'index': 'Month',
         'variable': 'Reason',
@@ -65,8 +61,8 @@ normalize_fig = px.bar(
 )
 
 normalize_table = dbc.Table.from_dataframe(
-    df = df_normalize_2.reset_index(),
-    id = "normalize_table",
+    df=df_normalize_2.reset_index(),
+    id="normalize_table",
     striped=True,
     bordered=True,
     hover=True,
@@ -93,7 +89,7 @@ month_slider = dcc.RangeSlider(
     min=0,
     max=len(df_counts.index) - 1,
     step=None,
-    marks={k:v for (k, v) in enumerate(df_counts.index)},
+    marks={k: v for (k, v) in enumerate(df_counts.index)},
     value=[0, len(df_counts.index) - 1],
 )
 
@@ -111,7 +107,7 @@ layout = html.Div(
                     ],
                 )
             ],
-            className = 'border mb-3 p-5',
+            className='border mb-3 p-5',
         ),
         html.Div(
             id='rangeslider_out'
@@ -137,7 +133,7 @@ layout = html.Div(
                     ],
                 )
             ],
-            className = 'border mb-3',
+            className='border mb-3',
         ),
         dbc.Row(
             children=[
@@ -160,7 +156,7 @@ layout = html.Div(
                     ],
                 )
             ],
-            className = 'border mb-3',
+            className='border mb-3',
         ),
     ]
 )
@@ -181,8 +177,3 @@ def page_1_dropdown(value):
     end_month = value[-1]
     return f'Start month is {start_month} and end month is {end_month}.'
 '''
-### Development Server
-# For isolated development purposes only, remove this section when ready
-# to link to index
-# if __name__ == '__main__':
-#     app.run_server(debug=True)
