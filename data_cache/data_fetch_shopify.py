@@ -112,14 +112,14 @@ def github_update(file_path):
     )
 
 ### Get all active Shopify orders ###
-active_orders = get_shopify_order_api(
-    endpoint= 'admin/api/2021-07/orders.json',
-    status='any',
-)
-generate_active_order_df(
-    records=active_orders,
-    path='data_cache/active_order_cache.crypt',
-)
+# active_orders = get_shopify_order_api(
+#     endpoint= 'admin/api/2021-07/orders.json',
+#     status='any',
+# )
+# generate_active_order_df(
+#     records=active_orders,
+#     path='data_cache/active_order_cache.crypt',
+# )
 github_update(
     file_path='data_cache/active_order_cache.crypt',
 )
