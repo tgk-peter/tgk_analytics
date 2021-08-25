@@ -56,7 +56,7 @@ def get_shopify_order_api(endpoint, status):
         next_url = response.links["next"]["url"]
         response = session.get(next_url, headers=headers)
         count += 1
-        print(response.headers['X-Shopify-Shop-Api-Call-Limit'], count)
+        print(f'# of request cycles: {count}')
         response_data = response.json()
         all_records.extend(response_data['orders'])
         # Sleep to avoid rate limit if approach bucket size
