@@ -58,8 +58,9 @@ def df_retain_orders_columns():
   return agg_dict
 
 # Resample into weeks to generate absolute counts
-df_retain_orders = df_orders_agg.resample('W', on='first_order_date') \
-                    .agg(df_retain_orders_columns())
+df_orders_agg['first_order_date'] = df_orders_agg['first_order_date'] - pd.to_timedelta(6, unit='d') # subtract 6 days to align with Monday start
+df_retain_orders = df_orders_agg.groupby(pd.Grouper(key='first_order_date', freq='W-MON')).agg(df_retain_orders_columns())
+df_retain_orders.rename(columns={'first_order_date':'first_order_week'}, inplace=True)
 
 # Divide by customers to generate percentages
 df_retain_orders_percent = df_retain_orders.iloc[:, 1:] \
@@ -198,7 +199,7 @@ layout = dbc.Container(
 
                         Table shows percentage of each cohort that has placed X number of subscription orders.
 
-                        *Example:* 65 customers placed their first subscription order in the week of 2021-06-20 (Sun - Sat). 72% placed a 2nd subscription order, 38% placed a 3rd subscription order, etc.
+                        *Example:* 46 customers placed their first subscription order in the week of 2021-06-21 (Mon - Sun). 78% placed a 2nd subscription order, 43% placed a 3rd subscription order, etc.
 
                         **Date Filtering** -
                         Rows can be filtered by date. Enter search string and press enter to filter. To reset, delete search string and press enter.
