@@ -23,6 +23,7 @@ CRP_PASSWORD = os.getenv('CRP_PASSWORD')
 # Uncomment when ready to link to index page
 from app import app
 
+###### TEST DATA ######
 data = {
     'Too Many Meals': [95, 75, 85, 65, 60],
     'Not Happy with Quality': [80, 90, 45, 55, 75],
@@ -42,6 +43,16 @@ df_counts = pd.DataFrame(data, index=indx)
 df_normalize = df_counts.div(df_counts.sum(axis=1), axis=0)
 
 df_normalize_2 = df_normalize.transpose()
+
+# DATAFRAMES #
+# Decrypt and load cancelled subscription dataframe
+df_cancel = crp.read_encrypted(path='data_cache/cancel_sub_cache.crypt', \
+            password=CRP_PASSWORD)
+
+# Group by month and cancellation reason. Count emails.
+df_cancel_agg = df_cancel.groupby([pd.Grouper(key='cancelled_at', freq='MS'), 'cancellation_reason']).agg({'email':'count'})
+df_cancel_agg.reset_index(inplace=True)
+
 
 # Cancellation 2 Layout #
 
@@ -84,13 +95,15 @@ checklist = dbc.FormGroup(
     ]
 )
 
+# Month Rangeslider
+month_list = df_cancel_agg['cancelled_at'].dt.strftime('%b %Y').unique()
 month_slider = dcc.RangeSlider(
     id='month_slider',
     min=0,
-    max=len(df_counts.index) - 1,
+    max=len(month_list) - 1,
     step=None,
-    marks={k: v for (k, v) in enumerate(df_counts.index)},
-    value=[0, len(df_counts.index) - 1],
+    marks={k: {'label': v, 'style': {'font-family': 'Ubuntu', 'writing-mode': 'vertical-rl', 'white-space': 'nowrap'}} for (k, v) in enumerate(month_list)},
+    value=[0, len(month_list) - 1],
 )
 
 # Layout
@@ -105,9 +118,10 @@ layout = html.Div(
                     children=[
                         month_slider,
                     ],
+                    className='mb-4',
                 )
             ],
-            className='border mb-3 p-5',
+            className='border mb-3 pb-5 pt-3',
         ),
         html.Div(
             id='rangeslider_out'
