@@ -50,7 +50,7 @@ def df_retain_orders_columns():
         agg_dict[key] = value
     return agg_dict
 
-# Resample into weeks to generate absolute counts #
+# Group by weeks to generate absolute counts #
 # subtract 6 days from first order date to align with Monday start
 df_orders_agg['first_order_date'] = (df_orders_agg['first_order_date']
                                      - pd.to_timedelta(6, unit='d'))
