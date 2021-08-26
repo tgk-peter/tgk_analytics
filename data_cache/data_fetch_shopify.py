@@ -42,7 +42,8 @@ def get_shopify_order_api(endpoint, status):
     status = status
     limit = 250
     fields = 'email,order_number,created_at,cancelled_at,line_items'
-    url = f"https://{shop}/{endpoint}?fields={fields}&status={status}&limit={limit}"
+    url = (f'https://{shop}/{endpoint}?fields={fields}&status={status}'
+           f'&limit={limit}')
 
     # Access and store first page of results
     session = requests.Session()
@@ -85,7 +86,8 @@ def generate_active_order_df(records, path):
         records,
         record_path='line_items',
         meta=['email', 'order_number', 'created_at', 'cancelled_at'])
-    df_orders_sub = df_orders_sub.loc[:, ['email', 'order_number', 'created_at', 'sku', 'cancelled_at']]
+    df_orders_sub = df_orders_sub.loc[:, ['email', 'order_number',
+                                          'created_at', 'sku', 'cancelled_at']]
     df_orders_sub['created_at'] = pd.to_datetime(df_orders_sub['created_at'])
     df_orders_sub['sku'].fillna('No SKU', inplace=True)
     df_orders_sub = df_orders_sub[df_orders_sub['sku'].str.contains('SUB')]
