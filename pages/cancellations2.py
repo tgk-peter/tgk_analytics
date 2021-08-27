@@ -52,20 +52,52 @@ df_cancel = crp.read_encrypted(path='data_cache/cancel_sub_cache.crypt',
 # Group by month and cancellation reason. Count emails.
 df_cancel_agg_grp = df_cancel.groupby(
     [pd.Grouper(key='cancelled_at', freq='MS'), 'cancellation_reason'])
-df_cancel_agg = df_cancel_agg_grp.agg({'email': 'count'})
+df_cancel_agg = df_cancel_agg_grp.agg(cancel_count=('email', 'count'))
 df_cancel_agg.reset_index(inplace=True)
+df_cancel_agg['month_cancel_total'] = \
+    df_cancel_agg.groupby('cancelled_at')['cancel_count'].transform('sum')
+df_cancel_agg['percent_total'] = \
+    df_cancel_agg['cancel_count'] / df_cancel_agg['month_cancel_total']
 
 # Cancellation 2 Layout #
 
 # layout components
-count_fig = px.line(
+count_line = px.line(
     data_frame=df_cancel_agg,
     x='cancelled_at',
-    y='email',
+    y='cancel_count',
     color='cancellation_reason',
-    title='Cancellation Counts Over Time',
+    title='Cancellation Counts Over Time - Individual Reasons',
     labels={
-        'email': 'Cancellations',
+        'cancel_count': 'Cancellations',
+        'cancelled_at': 'Month',
+        'cancellation_reason': 'Reason',
+    },
+    height=620,
+)
+
+count_bar = px.bar(
+    data_frame=df_cancel_agg,
+    x='cancelled_at',
+    y='cancel_count',
+    color='cancellation_reason',
+    title='Cancellation Counts Over Time - Stacked',
+    labels={
+        'cancel_count': 'Cancellations',
+        'cancelled_at': 'Month',
+        'cancellation_reason': 'Reason',
+    },
+    height=620,
+)
+
+count_normalize_bar = px.bar(
+    data_frame=df_cancel_agg,
+    x='cancelled_at',
+    y='percent_total',
+    color='cancellation_reason',
+    title='Cancellation Counts Over Time - Percentage',
+    labels={
+        'percent_total': '% of Cancellations',
         'cancelled_at': 'Month',
         'cancellation_reason': 'Reason',
     },
@@ -140,7 +172,7 @@ layout = html.Div(
                     children=[
                         dcc.Graph(
                             id='count_graph',
-                            figure=count_fig,
+                            figure=count_line,
                         ),
                     ],
                 )
@@ -162,8 +194,21 @@ layout = html.Div(
                 dbc.Col(
                     children=[
                         dcc.Graph(
-                            id='normalize_graph',
-                            figure=normalize_fig,
+                            id='count_bar',
+                            figure=count_bar,
+                        ),
+                    ],
+                )
+            ],
+            className='border mb-3',
+        ),
+        dbc.Row(
+            children=[
+                dbc.Col(
+                    children=[
+                        dcc.Graph(
+                            id='count_normalize_bar',
+                            figure=count_normalize_bar,
                         ),
                     ],
                 )
