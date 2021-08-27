@@ -47,7 +47,7 @@ df_normalize_2 = df_normalize.transpose()
 # DATAFRAMES #
 # Decrypt and load cancelled subscription dataframe
 df_cancel = crp.read_encrypted(path='data_cache/cancel_sub_cache.crypt',
-            password=CRP_PASSWORD)
+                               password=CRP_PASSWORD)
 
 # Group by month and cancellation reason. Count emails.
 df_cancel_agg_grp = df_cancel.groupby(
@@ -59,13 +59,17 @@ df_cancel_agg.reset_index(inplace=True)
 
 # layout components
 count_fig = px.line(
-    data_frame=df_counts,
+    data_frame=df_cancel_agg,
+    x='cancelled_at',
+    y='email',
+    color='cancellation_reason',
     title='Cancellation Counts Over Time',
     labels={
-        'value': 'Cancellations',
-        'index': 'Month',
-        'variable': 'Reason',
+        'email': 'Cancellations',
+        'cancelled_at': 'Month',
+        'cancellation_reason': 'Reason',
     },
+    height=620,
 )
 
 normalize_fig = px.bar(
@@ -143,16 +147,16 @@ layout = html.Div(
             ],
             className='border mb-3',
         ),
-        dbc.Row(
-            children=[
-                dbc.Col(
-                    children=[
-                        checklist,
-                    ],
-                )
-            ],
-            className='border mb-3',
-        ),
+        # dbc.Row(
+        #     children=[
+        #         dbc.Col(
+        #             children=[
+        #                 checklist,
+        #             ],
+        #         )
+        #     ],
+        #     className='border mb-3',
+        # ),
         dbc.Row(
             children=[
                 dbc.Col(
