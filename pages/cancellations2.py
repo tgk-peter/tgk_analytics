@@ -48,6 +48,7 @@ df_normalize_2 = df_normalize.transpose()
 # Decrypt and load cancelled subscription dataframe
 df_cancel = crp.read_encrypted(path='data_cache/cancel_sub_cache.crypt',
                                password=CRP_PASSWORD)
+df_cancel = df_cancel[df_cancel['cancelled_at'] > '2019-06-01']
 
 # Group by month and cancellation reason. Count emails.
 df_cancel_agg_grp = df_cancel.groupby(
@@ -102,6 +103,9 @@ count_normalize_bar = px.bar(
         'cancellation_reason': 'Reason',
     },
     height=620,
+)
+count_normalize_bar.update_layout(
+    yaxis={'tickformat': '%'}  # format yaxis to percentage
 )
 
 normalize_fig = px.bar(
@@ -215,16 +219,16 @@ layout = html.Div(
             ],
             className='border mb-3',
         ),
-        dbc.Row(
-            children=[
-                dbc.Col(
-                    children=[
-                        normalize_table,
-                    ],
-                )
-            ],
-            className='border mb-3',
-        ),
+        # dbc.Row(
+        #     children=[
+        #         dbc.Col(
+        #             children=[
+        #                 normalize_table,
+        #             ],
+        #         )
+        #     ],
+        #     className='border mb-3',
+        # ),
     ]
 )
 '''
