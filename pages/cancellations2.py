@@ -147,6 +147,7 @@ month_slider = dcc.RangeSlider(
     step=None,
     marks={k: {'label': v, 'style': mark_style}
            for (k, v) in enumerate(month_list)},
+    # value=month_list,
     value=[0, len(month_list) - 1],
 )
 
@@ -231,8 +232,24 @@ layout = html.Div(
         # ),
     ]
 )
-'''
-### Page 1 Callbacks ###
+
+# Page 1 Callbacks ###
+
+
+def time_slice(start_date, end_date):
+    '''Filter DataFrame by date range
+
+    Keyword arguments:
+    start_date -- beginning of date range
+    end_date -- end of date range
+    '''
+    cancelled_at_min = start_date
+    cancelled_at_max = end_date
+    date_range = (df_cancel["cancelled_at"] > cancelled_at_min)\
+        & (df_cancel["cancelled_at"] < cancelled_at_max)
+    df_cancel_slice = df_cancel.loc[date_range]
+    return df_cancel_slice
+
 @app.callback(
     Output(
         component_id='rangeslider_out',
@@ -244,7 +261,8 @@ layout = html.Div(
     )]
 )
 def page_1_dropdown(value):
-    start_month = value[0]
-    end_month = value[-1]
+    month_list = df_cancel_agg['cancelled_at'].dt.strftime('%Y-%m-%d').unique()
+    switcher = {k: v for k, v in enumerate(month_list)}
+    start_month = switcher.get(value[0])
+    end_month = switcher.get(value[1])
     return f'Start month is {start_month} and end month is {end_month}.'
-'''
