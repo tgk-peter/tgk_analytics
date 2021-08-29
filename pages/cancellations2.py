@@ -77,36 +77,36 @@ df_cancel_agg['percent_total'] = \
 #     height=620,
 # )
 
-count_bar = px.bar(
-    data_frame=df_cancel_agg,
-    x='cancelled_at',
-    y='cancel_count',
-    color='cancellation_reason',
-    title='Cancellation Counts Over Time - Stacked',
-    labels={
-        'cancel_count': 'Cancellations',
-        'cancelled_at': 'Month',
-        'cancellation_reason': 'Reason',
-    },
-    height=620,
-)
+# count_bar = px.bar(
+#     data_frame=df_cancel_agg,
+#     x='cancelled_at',
+#     y='cancel_count',
+#     color='cancellation_reason',
+#     title='Cancellation Counts Over Time - Stacked',
+#     labels={
+#         'cancel_count': 'Cancellations',
+#         'cancelled_at': 'Month',
+#         'cancellation_reason': 'Reason',
+#     },
+#     height=620,
+# )
 
-count_normalize_bar = px.bar(
-    data_frame=df_cancel_agg,
-    x='cancelled_at',
-    y='percent_total',
-    color='cancellation_reason',
-    title='Cancellation Counts Over Time - Percentage',
-    labels={
-        'percent_total': '% of Cancellations',
-        'cancelled_at': 'Month',
-        'cancellation_reason': 'Reason',
-    },
-    height=620,
-)
-count_normalize_bar.update_layout(
-    yaxis={'tickformat': '%'}  # format yaxis to percentage
-)
+# count_normalize_bar = px.bar(
+#     data_frame=df_cancel_agg,
+#     x='cancelled_at',
+#     y='percent_total',
+#     color='cancellation_reason',
+#     title='Cancellation Counts Over Time - Percentage',
+#     labels={
+#         'percent_total': '% of Cancellations',
+#         'cancelled_at': 'Month',
+#         'cancellation_reason': 'Reason',
+#     },
+#     height=620,
+# )
+# count_normalize_bar.update_layout(
+#     yaxis={'tickformat': '%'}  # format yaxis to percentage
+# )
 
 normalize_fig = px.bar(
     data_frame=df_normalize,
@@ -193,7 +193,7 @@ layout = html.Div(
                     children=[
                         dcc.Graph(
                             id='count_bar',
-                            figure=count_bar,
+                            # figure=count_bar,
                         ),
                     ],
                 )
@@ -206,7 +206,7 @@ layout = html.Div(
                     children=[
                         dcc.Graph(
                             id='count_normalize_bar',
-                            figure=count_normalize_bar,
+                            # figure=count_normalize_bar,
                         ),
                     ],
                 )
@@ -254,7 +254,7 @@ layout = html.Div(
     )
 )
 def df_store(value):
-    ''' Update dcc.Store
+    ''' Update dcc.Store that all graphs access
     '''
     months = df_cancel_agg['cancelled_at'].dt.strftime('%Y-%m-%d').unique()
     switcher = {k: v for k, v in enumerate(months)}
@@ -275,7 +275,7 @@ def df_store(value):
         component_property='data',
     )
 )
-def update_count_graph(data):
+def update_count_line(data):
     count_line = px.line(
         data_frame=data,
         x='cancelled_at',
@@ -290,6 +290,61 @@ def update_count_graph(data):
         height=620,
     )
     return count_line
+
+@app.callback(
+    Output(
+        component_id='count_bar',
+        component_property='figure',
+    ),
+    Input(
+        component_id='df_output',
+        component_property='data',
+    )
+)
+def update_count_bar(data):
+    count_bar = px.bar(
+        data_frame=data,
+        x='cancelled_at',
+        y='cancel_count',
+        color='cancellation_reason',
+        title='Cancellation Counts Over Time - Stacked',
+        labels={
+            'cancel_count': 'Cancellations',
+            'cancelled_at': 'Month',
+            'cancellation_reason': 'Reason',
+        },
+        height=620,
+    )
+    return count_bar
+
+@app.callback(
+    Output(
+        component_id='count_normalize_bar',
+        component_property='figure',
+    ),
+    Input(
+        component_id='df_output',
+        component_property='data',
+    )
+)
+def update_count_bar_norm(data):
+    count_normalize_bar = px.bar(
+        data_frame=data,
+        x='cancelled_at',
+        y='percent_total',
+        color='cancellation_reason',
+        title='Cancellation Counts Over Time - Percentage',
+        labels={
+            'percent_total': '% of Cancellations',
+            'cancelled_at': 'Month',
+            'cancellation_reason': 'Reason',
+        },
+        height=620,
+    )
+    count_normalize_bar.update_layout(
+        yaxis={'tickformat': '%'}  # format yaxis to percentage
+    )
+    return count_normalize_bar
 
 # @app.callback(
 #     Output(
