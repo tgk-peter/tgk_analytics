@@ -63,19 +63,19 @@ df_cancel_agg['percent_total'] = \
 # Cancellation 2 Layout #
 
 # layout components
-count_line = px.line(
-    data_frame=df_cancel_agg,
-    x='cancelled_at',
-    y='cancel_count',
-    color='cancellation_reason',
-    title='Cancellation Counts Over Time - Individual Reasons',
-    labels={
-        'cancel_count': 'Cancellations',
-        'cancelled_at': 'Month',
-        'cancellation_reason': 'Reason',
-    },
-    height=620,
-)
+# count_line = px.line(
+#     data_frame=df_cancel_agg,
+#     x='cancelled_at',
+#     y='cancel_count',
+#     color='cancellation_reason',
+#     title='Cancellation Counts Over Time - Individual Reasons',
+#     labels={
+#         'cancel_count': 'Cancellations',
+#         'cancelled_at': 'Month',
+#         'cancellation_reason': 'Reason',
+#     },
+#     height=620,
+# )
 
 count_bar = px.bar(
     data_frame=df_cancel_agg,
@@ -172,7 +172,7 @@ layout = html.Div(
             children=dbc.Col(
                 dcc.Graph(
                     id='count_graph',
-                    figure=count_line,
+                    # figure=count_line,
                 ),
             ),
             className='border mb-3',
@@ -260,11 +260,36 @@ def df_store(value):
     switcher = {k: v for k, v in enumerate(months)}
     cancelled_at_min = switcher.get(value[0])
     cancelled_at_max = switcher.get(value[1])
-    date_range = (df_cancel_agg["cancelled_at"] > cancelled_at_min)\
-        & (df_cancel_agg["cancelled_at"] < cancelled_at_max)
+    date_range = (df_cancel_agg["cancelled_at"] >= cancelled_at_min)\
+        & (df_cancel_agg["cancelled_at"] <= cancelled_at_max)
     df_cancel_slice = df_cancel_agg.loc[date_range]
     return df_cancel_slice.to_dict('records')
 
+@app.callback(
+    Output(
+        component_id='count_graph',
+        component_property='figure',
+    ),
+    Input(
+        component_id='df_output',
+        component_property='data',
+    )
+)
+def update_count_graph(data):
+    count_line = px.line(
+        data_frame=data,
+        x='cancelled_at',
+        y='cancel_count',
+        color='cancellation_reason',
+        title='Cancellation Counts Over Time - Individual Reasons',
+        labels={
+            'cancel_count': 'Cancellations',
+            'cancelled_at': 'Month',
+            'cancellation_reason': 'Reason',
+        },
+        height=620,
+    )
+    return count_line
 
 # @app.callback(
 #     Output(
