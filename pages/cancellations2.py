@@ -154,34 +154,27 @@ month_slider = dcc.RangeSlider(
 # Layout
 layout = html.Div(
     children=[
+        dcc.Store(id='df_output'),
         html.H1(
             children='Cancellations 2',
         ),
         dbc.Row(
-            children=[
-                dbc.Col(
-                    children=[
-                        month_slider,
-                    ],
-                    className='mb-4',
-                )
-            ],
+            children=dbc.Col(
+                children=month_slider,
+                className='mb-4',
+                ),
             className='border mb-3 pb-5 pt-3',
         ),
         html.Div(
             id='rangeslider_out'
         ),
         dbc.Row(
-            children=[
-                dbc.Col(
-                    children=[
-                        dcc.Graph(
-                            id='count_graph',
-                            figure=count_line,
-                        ),
-                    ],
-                )
-            ],
+            children=dbc.Col(
+                dcc.Graph(
+                    id='count_graph',
+                    figure=count_line,
+                ),
+            ),
             className='border mb-3',
         ),
         # dbc.Row(
@@ -236,33 +229,56 @@ layout = html.Div(
 # Page 1 Callbacks ###
 
 
-def time_slice(start_date, end_date):
-    '''Filter DataFrame by date range
-
-    Keyword arguments:
-    start_date -- beginning of date range
-    end_date -- end of date range
-    '''
-    cancelled_at_min = start_date
-    cancelled_at_max = end_date
-    date_range = (df_cancel["cancelled_at"] > cancelled_at_min)\
-        & (df_cancel["cancelled_at"] < cancelled_at_max)
-    df_cancel_slice = df_cancel.loc[date_range]
-    return df_cancel_slice
+# def time_slice(start_date, end_date):
+#     '''Filter DataFrame by date range
+#
+#     Keyword arguments:
+#     start_date -- beginning of date range
+#     end_date -- end of date range
+#     '''
+#     cancelled_at_min = start_date
+#     cancelled_at_max = end_date
+#     date_range = (df_cancel["cancelled_at"] > cancelled_at_min)\
+#         & (df_cancel["cancelled_at"] < cancelled_at_max)
+#     df_cancel_slice = df_cancel.loc[date_range]
+#     return df_cancel_slice
 
 @app.callback(
     Output(
-        component_id='rangeslider_out',
-        component_property='children',
+        component_id='df_output',
+        component_property='data',
     ),
-    [Input(
+    Input(
         component_id='month_slider',
         component_property='value',
-    )]
+    )
 )
-def page_1_dropdown(value):
-    month_list = df_cancel_agg['cancelled_at'].dt.strftime('%Y-%m-%d').unique()
-    switcher = {k: v for k, v in enumerate(month_list)}
-    start_month = switcher.get(value[0])
-    end_month = switcher.get(value[1])
-    return f'Start month is {start_month} and end month is {end_month}.'
+def df_store(value):
+    ''' Update dcc.Store
+    '''
+    months = df_cancel_agg['cancelled_at'].dt.strftime('%Y-%m-%d').unique()
+    switcher = {k: v for k, v in enumerate(months)}
+    cancelled_at_min = switcher.get(value[0])
+    cancelled_at_max = switcher.get(value[1])
+    date_range = (df_cancel_agg["cancelled_at"] > cancelled_at_min)\
+        & (df_cancel_agg["cancelled_at"] < cancelled_at_max)
+    df_cancel_slice = df_cancel_agg.loc[date_range]
+    return df_cancel_slice.to_dict('records')
+
+
+# @app.callback(
+#     Output(
+#         component_id='rangeslider_out',
+#         component_property='children',
+#     ),
+#     [Input(
+#         component_id='month_slider',
+#         component_property='value',
+#     )]
+# )
+# def page_1_dropdown(value):
+#     month_list = df_cancel_agg['cancelled_at'].dt.strftime('%Y-%m-%d').unique()
+#     switcher = {k: v for k, v in enumerate(month_list)}
+#     start_month = switcher.get(value[0])
+#     end_month = switcher.get(value[1])
+#     return f'Start month is {start_month} and end month is {end_month}.'
