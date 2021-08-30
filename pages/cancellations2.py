@@ -226,7 +226,7 @@ layout = html.Div(
     ]
 )
 
-# Page 1 Callbacks ###
+# Page 2 Callbacks ###
 
 
 # def time_slice(start_date, end_date):
