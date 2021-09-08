@@ -74,17 +74,7 @@ df_exempt_que.columns = ['Address ID', 'Date Scheduled', 'Total Price', 'Custome
 
 # PAGE LAYOUT #
 
-active_exempt_table = DataTable(
-    id='active_exempt',
-    columns=[{"name": i, "id": i} for i in df_exempt_que.columns],
-    data=df_exempt_que.to_dict('records'),
-    # page_size=26,
-    style_cell={'textAlign': 'center', 'fontSize': 16, 'font-family': 'Ubuntu'},
-    filter_action='native',
-    # style_data_conditional=conditional_style_all,
-)
-
-active_exempt_table_2 = dbc.Table.from_dataframe(
+active_exempt_table = dbc.Table.from_dataframe(
     df=df_exempt_que,
     id="cancel_customers",
     striped=True,
@@ -97,11 +87,10 @@ active_exempt_table_2 = dbc.Table.from_dataframe(
 app.layout = dbc.Container(
     children=[
         dbc.Row(dbc.Col(dcc.Markdown('''
-        # Pricing Exempt Customers
+        # Price Increase Exempt Customers
         Customers with qued charges that are exempt from price increase.
         '''))),
         active_exempt_table,
-        active_exempt_table_2,
         html.Div(
             id='page-1-content',
         ),
