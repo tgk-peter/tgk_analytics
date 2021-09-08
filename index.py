@@ -48,13 +48,13 @@ index_layout = dbc.Jumbotron(
         ),
         html.Br(),
         dcc.Link(
-            children='Go to Cancellations 2',
-            href='/cancellations-2',
+            children='Go to Cancellations over Time',
+            href='/cancellations-over-time',
         ),
         html.Br(),
         dcc.Link(
             children='Go to Retention By Order',
-            href='/retention_by_order',
+            href='/retention-by-order',
         ),
     ]
 )
@@ -87,7 +87,7 @@ def display_page(pathname):
         "/" : index_layout,
         "/meal-tag" : meal_tag.layout,
         "/cancellations" : cancellations.layout,
-        "/cancellations-2" : cancellations2.layout,
-        '/retention_by_order' : retention_order.layout
+        "/cancellations-over-time" : cancellations2.layout,
+        '/retention-by-order' : retention_order.layout
     }
     return switcher.get(pathname, "404")
