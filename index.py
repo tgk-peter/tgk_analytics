@@ -13,6 +13,7 @@ from app import server
 from app import app
 # Import pages
 from pages import meal_tag, cancellations, cancellations2, retention_order
+from pages import price_exempt
 
 # Page container #
 page_container = dbc.Container(
@@ -57,6 +58,11 @@ index_layout = dbc.Jumbotron(
             children='Go to Retention By Order',
             href='/retention-by-order',
         ),
+        html.Br(),
+        dcc.Link(
+            children='Go to Price Increase Exempt Customers',
+            href='/price-exempt',
+        ),
     ]
 )
 
@@ -68,7 +74,8 @@ app.validation_layout = html.Div(
         meal_tag.layout,
         cancellations.layout,
         cancellations2.layout,
-        retention_order.layout
+        retention_order.layout,
+        price_exempt.layout
     ]
 )
 
@@ -91,6 +98,7 @@ def display_page(pathname):
         "/meal-tag": meal_tag.layout,
         "/cancellations": cancellations.layout,
         "/cancellations-over-time": cancellations2.layout,
-        '/retention-by-order': retention_order.layout
+        '/retention-by-order': retention_order.layout,
+        '/price-exempt': price_exempt.layout
     }
     return switcher.get(pathname, "404")

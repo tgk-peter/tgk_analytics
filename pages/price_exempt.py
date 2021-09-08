@@ -21,15 +21,8 @@ import requests
 load_dotenv()  # take environment variables from .env
 RECHARGE_API_TOKEN = os.getenv('RECHARGE_API_TOKEN')
 
-# Dash instance #
-# For isolated development purposes only, remove this section when ready
-# to link to index
-external_stylesheets = [dbc.themes.UNITED]
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-
 # Import Dash Instance #
-# Uncomment when ready to link to index page
-#from app import app
+from app import app
 
 # DATAFRAME #
 # Get upcoming charges
@@ -65,7 +58,7 @@ df_charge = df_charge[['address_id', 'scheduled_at', 'total_price', 'email',
                       'first_name', 'last_name']]
 
 # Load price exempt customer df
-exempt_path = '../data_cache/price_exempt_all.csv'
+exempt_path = 'data_cache/price_exempt_all.csv'
 df_exempt = pd.read_csv(exempt_path)
 
 # Compare to price exempt list and keep only those customers
@@ -74,7 +67,7 @@ df_exempt_que.columns = ['Address ID', 'Date Scheduled', 'Total Price', 'Custome
 
 
 # PAGE LAYOUT #
-
+# Layout components
 active_exempt_table = dbc.Table.from_dataframe(
     df=df_exempt_que,
     id='active_exempt',
@@ -84,8 +77,8 @@ active_exempt_table = dbc.Table.from_dataframe(
     responsive=True,
 )
 
-# delete 'app.' when ready to link to index page
-app.layout = dbc.Container(
+# Layout
+layout = dbc.Container(
     children=[
         dbc.Row(dbc.Col(dcc.Markdown('''
         # Price Increase Exempt Customers
@@ -97,9 +90,3 @@ app.layout = dbc.Container(
         ),
     ]
 )
-
-# Development Server
-# For isolated development purposes only, remove this section when ready
-# to link to index
-if __name__ == '__main__':
-    app.run_server(debug=True)
