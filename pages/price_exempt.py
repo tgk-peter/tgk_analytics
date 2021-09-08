@@ -6,8 +6,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
-from dash.dependencies import Input, Output
-from dash_table import DataTable
+
 
 # ENV imports
 from dotenv import load_dotenv
@@ -15,7 +14,6 @@ import os
 
 # Other
 from datetime import date, timedelta
-import json
 import pandas as pd
 import requests
 
@@ -35,6 +33,8 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 # DATAFRAME #
 # Get upcoming charges
+
+
 def get_recharge_charges(date_min, date_max, limit=250, status='QUEUED'):
     ''' Get charges from Recharge API
 
@@ -44,8 +44,9 @@ def get_recharge_charges(date_min, date_max, limit=250, status='QUEUED'):
         date_min - Show charges scheduled after the given date.
         date_max - Show charges scheduled before the given date.
     '''
-    headers = {"X-Recharge-Access-Token": RECHARGE_API_TOKEN}
-    url = f"https://api.rechargeapps.com/charges?limit={limit}&status={status}&date_min={date_min}&date_max={date_max}"
+    headers = {'X-Recharge-Access-Token': RECHARGE_API_TOKEN}
+    url = (f'https://api.rechargeapps.com/charges?limit={limit}&status={status}'
+           f'&date_min={date_min}&date_max={date_max}')
 
     response = requests.get(url, headers=headers)
     charge_data = response.json()['charges']
@@ -76,7 +77,7 @@ df_exempt_que.columns = ['Address ID', 'Date Scheduled', 'Total Price', 'Custome
 
 active_exempt_table = dbc.Table.from_dataframe(
     df=df_exempt_que,
-    id="cancel_customers",
+    id='active_exempt',
     striped=True,
     bordered=True,
     hover=True,
@@ -96,22 +97,6 @@ app.layout = dbc.Container(
         ),
     ]
 )
-
-# PAGE CALLBACKS #
-'''
-@app.callback(
-    Output(
-        component_id='page-1-content',
-        component_property='children',
-    ),
-    Input(
-        component_id='page-1-dropdown',
-        component_property='value',
-    )
-)
-def page_1_dropdown(value):
-    return 'You have selected "{}"'.format(value)
-'''
 
 # Development Server
 # For isolated development purposes only, remove this section when ready
