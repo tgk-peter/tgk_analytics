@@ -1,29 +1,33 @@
-### Import Packages ###
-import dash
+# IMPORTS #
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 from dash_extensions import Download
 from dash_extensions.snippets import send_data_frame
-import pandas as pd
-from datetime import date, timedelta, datetime as dt
-import cryptpandas as crp
 
-### Import .env variables
+import cryptpandas as crp
+from datetime import date  # , timedelta, datetime as dt
 from dotenv import load_dotenv
 import os
+import pandas as pd
+
+# Import .env variables
+
 load_dotenv()  # take environment variables from .env
 CRP_PASSWORD = os.getenv('CRP_PASSWORD')
 
-### Import Dash Instance ###
+# Import Dash Instance #
 from app import app
 
+# DATAFRAME #
 # Decrypt and load cancelled subscription dataframe
-df_cancel = crp.read_encrypted(path='data_cache/cancel_sub_cache.crypt', \
-            password=CRP_PASSWORD)
+df_cancel = crp.read_encrypted(path='data_cache/cancel_sub_cache.crypt',
+                               password=CRP_PASSWORD)
 
-### Cancellation Layout ###
+# LAYOUT #
+
+# Layout Components
 datepicker_range = dcc.DatePickerRange(
     id='date-picker-range',
     min_date_allowed=date(2019, 6, 1),
@@ -33,19 +37,13 @@ datepicker_range = dcc.DatePickerRange(
     end_date=pd.Timestamp('today').floor('D'),
 )
 
-
+# Page layout
 layout = html.Div(
     children=[
-        html.H1(
-            children='Cancellations',
-        ),
+        html.H1('Cancellations'),
         dbc.Row(
             children=[
-                dbc.Col(
-                    children=[
-                        datepicker_range,
-                    ],
-                ),
+                dbc.Col(datepicker_range),
                 dbc.Col(
                     children=[
                         html.Div(
@@ -172,8 +170,11 @@ layout = html.Div(
         ),
     ]
 )
-### Cancellation Callbacks ###
-## Function to slice by time
+# CALLBACKS #
+
+# Helper functions
+
+
 def time_slice(start_date, end_date):
     '''Filter DataFrame by date range
 
@@ -184,20 +185,21 @@ def time_slice(start_date, end_date):
     cancelled_at_min = start_date
     cancelled_at_max = end_date
     date_range = (df_cancel["cancelled_at"] > cancelled_at_min)\
-            & (df_cancel["cancelled_at"] < cancelled_at_max)
+        & (df_cancel["cancelled_at"] < cancelled_at_max)
     df_cancel_slice = df_cancel.loc[date_range]
     return df_cancel_slice
+
 
 def df_non_empty(df_cancel_slice):
     ''' Create DataFrame for non-empty reasons
     '''
     reasons_not_empty = (df_cancel_slice["cancellation_reason_comments"].notnull()) \
-                        & (df_cancel_slice["cancellation_reason_comments"] != "")
+        & (df_cancel_slice["cancellation_reason_comments"] != "")
     df_cancel_reasons = df_cancel_slice.loc[reasons_not_empty]
-    df_cancel_reasons = df_cancel_reasons.sort_values(by="cancelled_at", ascending=False)
+    df_cancel_reasons = df_cancel_reasons.sort_values(by="cancelled_at",
+                                                      ascending=False)
     return df_cancel_reasons
 
-## Update cancellation total display
 @app.callback(
     Output(
         component_id='cancel_total_box',
@@ -213,11 +215,12 @@ def df_non_empty(df_cancel_slice):
     )]
 )
 def update_total_cancels(start_date, end_date):
+    ''' Update cancellation total display
+    '''
     df_cancel_slice = time_slice(start_date, end_date)
     df_cancel_total = df_cancel_slice["cancellation_reason"].value_counts().sum()
     return html.H5(f'Total Cancellations = {df_cancel_total}')
 
-## Update cancel counts container with table
 @app.callback(
     Output(
         component_id='cancel_counts_container',
@@ -233,44 +236,48 @@ def update_total_cancels(start_date, end_date):
     )]
 )
 def update_count_table(start_date, end_date):
+    ''' Update cancel counts container with table
+    '''
     df_cancel_slice = time_slice(start_date, end_date)
-    df_cancel_counts = df_cancel_slice["cancellation_reason"].value_counts() \
-                        .to_frame().reset_index()
+    df_cancel_counts = df_cancel_slice["cancellation_reason"].value_counts()\
+        .to_frame().reset_index()
     df_cancel_counts.rename(
-        columns={"index":"Reason", "cancellation_reason":"Count"},
+        columns={"index": "Reason", "cancellation_reason": "Count"},
         inplace=True
     )
     return dbc.Table.from_dataframe(
-        df = df_cancel_counts,
-        id = "cancel_counts",
+        df=df_cancel_counts,
+        id="cancel_counts",
         striped=True,
         bordered=True,
         hover=True,
         responsive=True,
     )
 
-## Update cancel reasons table
+
 @app.callback(
     Output(
         component_id='cancel_reasons_container',
         component_property='children',
     ),
-    [Input(
+    Input(
         component_id='date-picker-range',
         component_property='start_date',
     ),
     Input(
         component_id='date-picker-range',
         component_property='end_date',
-    )]
+    )
 )
 def update_reason_table(start_date, end_date):
+    ''' Update cancel reasons table
+    '''
     df_cancel_slice = time_slice(start_date, end_date)
 
-    ## Dataframe for non-empty reasons
+    # Dataframe for non-empty reasons
     df_cancel_reasons = df_non_empty(df_cancel_slice=df_cancel_slice)
 
-    ## Return table with DataFrame
+    # Return table with DataFrame
     return dbc.Table.from_dataframe(
         df = df_cancel_reasons,
         id = "cancel_reasons",
@@ -280,7 +287,7 @@ def update_reason_table(start_date, end_date):
         responsive=True,
     )
 
-## Cancel reasons download csv
+##
 @app.callback(
     Output(
         component_id='download_reason_csv',
@@ -301,21 +308,22 @@ def update_reason_table(start_date, end_date):
     prevent_initial_call=True,
 )
 def download_reason_csv(start_date, end_date, n_clicks):
+    ''' Cancel reasons download csv
+    '''
     df_cancel_slice = time_slice(start_date, end_date)
 
-    ## Dataframe for non-empty reasons
+    # Dataframe for non-empty reasons
     df_cancel_reasons = df_non_empty(df_cancel_slice=df_cancel_slice)
 
-    return send_data_frame(df_cancel_reasons.to_csv, \
-            f"cancel_comments_{start_date}_{end_date}.csv")
+    return send_data_frame(df_cancel_reasons.to_csv,
+                           f"cancel_comments_{start_date}_{end_date}.csv")
 
-## Update customers by cancel reason table
 @app.callback(
     Output(
         component_id='customers_by_reason_container',
         component_property='children',
     ),
-    [Input(
+    Input(
         component_id='date-picker-range',
         component_property='start_date',
     ),
@@ -326,21 +334,25 @@ def download_reason_csv(start_date, end_date, n_clicks):
     Input(
         component_id='reason-dropdown',
         component_property='value',
-    )]
+    )
 )
 def update_customer_by_reason_table(start_date, end_date, reason):
+    ''' Update customers by cancel reason table
+    '''
     df_cancel_slice = time_slice(start_date, end_date)
 
-    ## Dataframe for customers by reason
+    # Dataframe for customers by reason
     reason = df_cancel_slice["cancellation_reason"] == reason
     df_cancel_customers = df_cancel_slice.loc[reason]
-    df_cancel_customers = df_cancel_customers.loc[:, ["email", "cancelled_at", "cancellation_reason"]]
-    df_cancel_customers = df_cancel_customers.sort_values(by="cancelled_at", ascending=False)
+    df_cancel_customers = df_cancel_customers.loc[:, ["email", "cancelled_at",
+                                                      "cancellation_reason"]]
+    df_cancel_customers = df_cancel_customers.sort_values(by="cancelled_at",
+                                                          ascending=False)
 
-    ## Return table with DataFrame
+    # Return table with DataFrame
     return dbc.Table.from_dataframe(
-        df = df_cancel_customers,
-        id = "cancel_customers",
+        df=df_cancel_customers,
+        id="cancel_customers",
         striped=True,
         bordered=True,
         hover=True,
