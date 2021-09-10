@@ -14,6 +14,7 @@ import os
 # Other
 from datetime import date, timedelta, datetime as dt
 import pandas as pd
+import pytz
 import requests
 
 # Import .env variables
@@ -81,7 +82,8 @@ markdown = dcc.Markdown('''
     Customers with qued charges that are exempt from price increase.
     ''')
 
-update_time = dt.now().strftime('%b %m, %Y %I:%M%p')
+# update timestamp for eastern timezone
+update_time = dt.now(pytz.timezone('US/Eastern')).strftime('%b %m, %Y %I:%M%p')
 
 # Layout
 layout = dbc.Container(
