@@ -2,7 +2,6 @@
 
 # IMPORTS #
 # Dash
-import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
@@ -13,7 +12,7 @@ from dotenv import load_dotenv
 import os
 
 # Other
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime as dt
 import pandas as pd
 import requests
 
@@ -77,14 +76,19 @@ active_exempt_table = dbc.Table.from_dataframe(
     responsive=True,
 )
 
+markdown = dcc.Markdown('''
+    # Price Increase Exempt Customers
+    Customers with qued charges that are exempt from price increase.
+    ''')
+
+update_time = dt.now().strftime('%b %m, %Y %I:%M%p')
+
 # Layout
 layout = dbc.Container(
     children=[
-        dbc.Row(dbc.Col(dcc.Markdown('''
-        # Price Increase Exempt Customers
-        Customers with qued charges that are exempt from price increase.
-        '''))),
-        active_exempt_table,
+        dbc.Row(dbc.Col(markdown)),
+        dbc.Row(dbc.Col(f'Last updated: {update_time}')),
+        dbc.Row(dbc.Col(active_exempt_table)),
         html.Div(
             id='page-1-content',
         ),
