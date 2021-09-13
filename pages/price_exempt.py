@@ -83,7 +83,9 @@ markdown = dcc.Markdown('''
     ''')
 
 # update timestamp for eastern timezone
-update_time = dt.now().strftime('%c')
+#update_time = dt.now(pytz.timezone('America/New_York')).strftime('%c')
+update_time = dt.now(pytz.timezone('America/New_York')).strftime('%b %d, %Y %I:%M%p')
+#update_time = dt.now().strftime('%b %m, %Y %I:%M%p')
 
 # Layout
 layout = dbc.Container(
