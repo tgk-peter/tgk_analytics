@@ -148,6 +148,17 @@ layout = html.Div(
                             ],
                             className='card-text',
                         ),
+                        dbc.Button(
+                            children=[
+                                'Download CSV'
+                            ],
+                            id='btn_reason_indiv_csv',
+                            color='primary',
+                            className='mb-3',
+                        ),
+                        Download(
+                            id='dl_reason_indiv_csv',
+                        ),
                         dcc.Dropdown(
                             id='reason-dropdown',
                             options=[{'label': i, 'value': i} for i in df_cancel \
@@ -205,14 +216,14 @@ def df_non_empty(df_cancel_slice):
         component_id='cancel_total_box',
         component_property='children',
     ),
-    [Input(
+    Input(
         component_id='date-picker-range',
         component_property='start_date',
     ),
     Input(
         component_id='date-picker-range',
         component_property='end_date',
-    )]
+    )
 )
 def update_total_cancels(start_date, end_date):
     ''' Update cancellation total display
@@ -358,3 +369,42 @@ def update_customer_by_reason_table(start_date, end_date, reason):
         hover=True,
         responsive=True,
     )
+
+@app.callback(
+    Output(
+        component_id='dl_reason_indiv_csv',
+        component_property='data',
+    ),
+    Input(
+        component_id='btn_reason_indiv_csv',
+        component_property='n_clicks',
+    ),
+    State(
+        component_id='reason-dropdown',
+        component_property='value',
+    ),
+    State(
+        component_id='date-picker-range',
+        component_property='start_date',
+    ),
+    State(
+        component_id='date-picker-range',
+        component_property='end_date',
+    ),
+    prevent_initial_call=True,
+)
+def download_reason_csv(n_clicks, reason, start_date, end_date):
+    ''' Individual cancel reason download csv
+    '''
+    df_cancel_slice = time_slice(start_date, end_date)
+
+    # Dataframe for customers by reason
+    reason = df_cancel_slice["cancellation_reason"] == reason
+    df_cancel_customers = df_cancel_slice.loc[reason]
+    df_cancel_customers = df_cancel_customers.loc[:, ["email", "cancelled_at",
+                                                      "cancellation_reason"]]
+    df_cancel_customers = df_cancel_customers.sort_values(by="cancelled_at",
+                                                          ascending=False)
+
+    return send_data_frame(df_cancel_customers.to_csv,
+                           f"cancel_reason_{start_date}_{end_date}.csv")
