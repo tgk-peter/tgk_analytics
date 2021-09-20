@@ -162,7 +162,7 @@ layout = html.Div(
                         dcc.Dropdown(
                             id='reason-dropdown',
                             options=[{'label': i, 'value': i} for i in df_cancel \
-                            ['cancellation_reason'].unique()],
+                                     ['cancellation_reason'].unique()],
                             placeholder='Select a reason',
                             className='mb-2',
                         ),
@@ -210,6 +210,7 @@ def df_non_empty(df_cancel_slice):
     df_cancel_reasons = df_cancel_reasons.sort_values(by="cancelled_at",
                                                       ascending=False)
     return df_cancel_reasons
+
 
 @app.callback(
     Output(
@@ -290,8 +291,8 @@ def update_reason_table(start_date, end_date):
 
     # Return table with DataFrame
     return dbc.Table.from_dataframe(
-        df = df_cancel_reasons,
-        id = "cancel_reasons",
+        df=df_cancel_reasons,
+        id="cancel_reasons",
         striped=True,
         bordered=True,
         hover=True,
@@ -328,6 +329,7 @@ def download_reason_csv(n_clicks, start_date, end_date):
 
     return send_data_frame(df_cancel_reasons.to_csv,
                            f"cancel_comments_{start_date}_{end_date}.csv")
+
 
 @app.callback(
     Output(
@@ -369,6 +371,7 @@ def update_customer_by_reason_table(start_date, end_date, reason):
         hover=True,
         responsive=True,
     )
+
 
 @app.callback(
     Output(
