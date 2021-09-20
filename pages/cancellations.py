@@ -1,7 +1,7 @@
 # IMPORTS #
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
 from dash_extensions import Download
 from dash_extensions.snippets import send_data_frame
@@ -293,21 +293,21 @@ def update_reason_table(start_date, end_date):
         component_id='download_reason_csv',
         component_property='data',
     ),
-    [Input(
-        component_id='date-picker-range',
-        component_property='start_date',
-    ),
-    Input(
-        component_id='date-picker-range',
-        component_property='end_date',
-    ),
     Input(
         component_id='btn_reason_csv',
         component_property='n_clicks',
-    )],
+    ),
+    State(
+        component_id='date-picker-range',
+        component_property='start_date',
+    ),
+    State(
+        component_id='date-picker-range',
+        component_property='end_date',
+    ),
     prevent_initial_call=True,
 )
-def download_reason_csv(start_date, end_date, n_clicks):
+def download_reason_csv(n_clicks, start_date, end_date):
     ''' Cancel reasons download csv
     '''
     df_cancel_slice = time_slice(start_date, end_date)
