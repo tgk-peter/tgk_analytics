@@ -37,6 +37,14 @@ datepicker_range = dcc.DatePickerRange(
     end_date=pd.Timestamp('today').floor('D'),
 )
 
+dropdown = dcc.Dropdown(
+    id='reason-dropdown',
+    options=[{'label': 'All Reasons', 'value': 'All Reasons'}] +
+            [{'label': i, 'value': i} for i in df_cancel['cancellation_reason'].drop_duplicates().sort_values()],
+    placeholder='Select a reason',
+    className='mb-2',
+)
+
 # Page layout
 layout = html.Div(
     children=[
@@ -159,13 +167,7 @@ layout = html.Div(
                         Download(
                             id='dl_reason_indiv_csv',
                         ),
-                        dcc.Dropdown(
-                            id='reason-dropdown',
-                            options=[{'label': i, 'value': i} for i in df_cancel \
-                                     ['cancellation_reason'].unique()],
-                            placeholder='Select a reason',
-                            className='mb-2',
-                        ),
+                        dropdown,
                         dbc.Spinner(
                             children=[
                                 html.Div(id="customers_by_reason_container"),
@@ -349,14 +351,17 @@ def download_reason_csv(n_clicks, start_date, end_date):
         component_property='value',
     )
 )
-def update_customer_by_reason_table(start_date, end_date, reason):
+def update_customer_by_reason_table(start_date, end_date, value):
     ''' Update customers by cancel reason table
     '''
     df_cancel_slice = time_slice(start_date, end_date)
 
     # Dataframe for customers by reason
-    reason = df_cancel_slice["cancellation_reason"] == reason
-    df_cancel_customers = df_cancel_slice.loc[reason]
+    if value == 'All Reasons':
+        df_cancel_customers = df_cancel_slice
+    else:
+        reason = df_cancel_slice["cancellation_reason"] == value
+        df_cancel_customers = df_cancel_slice.loc[reason]
     df_cancel_customers = df_cancel_customers.loc[:, ["email", "cancelled_at",
                                                       "cancellation_reason"]]
     df_cancel_customers = df_cancel_customers.sort_values(by="cancelled_at",
@@ -396,14 +401,17 @@ def update_customer_by_reason_table(start_date, end_date, reason):
     ),
     prevent_initial_call=True,
 )
-def download_reason_csv(n_clicks, reason, start_date, end_date):
+def download_reason_csv(n_clicks, value, start_date, end_date):
     ''' Individual cancel reason download csv
     '''
     df_cancel_slice = time_slice(start_date, end_date)
 
     # Dataframe for customers by reason
-    reason = df_cancel_slice["cancellation_reason"] == reason
-    df_cancel_customers = df_cancel_slice.loc[reason]
+    if value == 'All Reasons':
+        df_cancel_customers = df_cancel_slice
+    else:
+        reason = df_cancel_slice["cancellation_reason"] == value
+        df_cancel_customers = df_cancel_slice.loc[reason]
     df_cancel_customers = df_cancel_customers.loc[:, ["email", "cancelled_at",
                                                       "cancellation_reason"]]
     df_cancel_customers = df_cancel_customers.sort_values(by="cancelled_at",
