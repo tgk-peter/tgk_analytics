@@ -2,6 +2,9 @@
 run.py #development server
 config.py
 
+# Mac desktop service
+.DS_Store
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
