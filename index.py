@@ -15,6 +15,51 @@ from app import app
 from pages import meal_tag, cancellations, cancellations2, retention_order
 from pages import price_exempt
 
+# Navbar #
+# navbar = dbc.Navbar(
+#     children=[
+#         dbc.Row(
+#             children=[
+#                 dbc.Col(dbc.NavbarBrand("TGK Analytics")),
+#             ],
+#             align="center",
+#             no_gutters=True,
+#             ),
+#     ],
+#     color='primary',
+#     dark=True,
+#     className='my-3',
+# )
+
+navbar = dbc.NavbarSimple(
+    children=[
+        dbc.NavItem(dbc.NavLink('Page 1', href='#')),
+        dbc.DropdownMenu(
+            children=[
+                dbc.DropdownMenuItem(
+                    children='Cancellations',
+                    href='/cancellations',
+                    external_link=True
+                ),
+                dbc.DropdownMenuItem(
+                    children='Cancellations Over Time',
+                    href='/cancellations-over-time',
+                    external_link=True
+                ),
+            ],
+            nav=True,
+            in_navbar=True,
+            label='Cancellation',
+        ),
+    ],
+    brand='TGK Analytics',
+    brand_href='/',
+    brand_external_link=True,
+    color='primary',
+    dark=True,
+    className='my-3',
+)
+
 # Page container #
 page_container = dbc.Container(
     children=[
@@ -23,6 +68,7 @@ page_container = dbc.Container(
             id='url',
             refresh=False,
         ),
+        navbar,
         # content will be rendered in this element
         html.Div(id='page-content')
     ]
@@ -35,8 +81,8 @@ app.layout = page_container
 index_layout = dbc.Jumbotron(
     children=[
         html.H1(
-            children="Welcome to TGK Analytics",
-            className="display-4",
+            children='Welcome to TGK Analytics',
+            className='display-4',
         ),
         html.Br(),
         dcc.Link(
@@ -87,18 +133,18 @@ app.validation_layout = html.Div(
         component_id='page-content',
         component_property='children',
         ),
-    [Input(
+    Input(
         component_id='url',
         component_property='pathname',
-        )]
+        )
 )
 def display_page(pathname):
     switcher = {
-        "/": index_layout,
-        "/meal-tag": meal_tag.layout,
-        "/cancellations": cancellations.layout,
-        "/cancellations-over-time": cancellations2.layout,
+        '/': index_layout,
+        '/meal-tag': meal_tag.layout,
+        '/cancellations': cancellations.layout,
+        '/cancellations-over-time': cancellations2.layout,
         '/retention-by-order': retention_order.layout,
         '/price-exempt': price_exempt.layout
     }
-    return switcher.get(pathname, "404")
+    return switcher.get(pathname, '404')
