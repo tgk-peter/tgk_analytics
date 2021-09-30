@@ -65,7 +65,6 @@ layout = html.Div(
                 ),
             className='border mb-3 pb-5 pt-3',
         ),
-        html.Div(id='rangeslider_out'),
         dbc.Row(
             children=dbc.Col(dcc.Graph(id='count_graph')),
             className='border mb-3',
