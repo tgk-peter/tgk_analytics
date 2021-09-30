@@ -97,30 +97,51 @@ index_layout = dbc.Jumbotron(
             children='Welcome to TGK Analytics',
             className='display-4',
         ),
-        html.Br(),
-        dcc.Link(
-            children='Go to Meal Tagging',
-            href='/meal-tag',
+        dbc.Row(
+            children=dbc.Col(
+                children=[
+                    html.H5('Cancellation'),
+                    dcc.Link(
+                        children='Go to Cancellations',
+                        href='/cancellations',
+                    ),
+                    html.Br(),
+                    dcc.Link(
+                        children='Go to Cancellations over Time',
+                        href='/cancellations-over-time',
+                    ),
+                ]
+            ),
+            className='mb-3',
         ),
-        html.Br(),
-        dcc.Link(
-            children='Go to Cancellations',
-            href='/cancellations',
+        dbc.Row(
+            children=dbc.Col(
+                children=[
+                    html.H5('Retention'),
+                    dcc.Link(
+                        children='Go to Retention By Order',
+                        href='/retention-by-order',
+                    ),
+                ]
+            ),
+            className='mb-3',
         ),
-        html.Br(),
-        dcc.Link(
-            children='Go to Cancellations over Time',
-            href='/cancellations-over-time',
-        ),
-        html.Br(),
-        dcc.Link(
-            children='Go to Retention By Order',
-            href='/retention-by-order',
-        ),
-        html.Br(),
-        dcc.Link(
-            children='Go to Price Increase Exempt Customers',
-            href='/price-exempt',
+        dbc.Row(
+            children=dbc.Col(
+                children=[
+                    html.H5('Other'),
+                    dcc.Link(
+                        children='Go to Meal Tagging',
+                        href='/meal-tag',
+                    ),
+                    html.Br(),
+                    dcc.Link(
+                        children='Go to Price Increase Exempt Customers',
+                        href='/price-exempt',
+                    ),
+                ]
+            ),
+            className='mb-3',
         ),
     ]
 )
