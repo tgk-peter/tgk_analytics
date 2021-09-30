@@ -16,24 +16,8 @@ from pages import meal_tag, cancellations, cancellations2, retention_order
 from pages import price_exempt
 
 # Navbar #
-# navbar = dbc.Navbar(
-#     children=[
-#         dbc.Row(
-#             children=[
-#                 dbc.Col(dbc.NavbarBrand("TGK Analytics")),
-#             ],
-#             align="center",
-#             no_gutters=True,
-#             ),
-#     ],
-#     color='primary',
-#     dark=True,
-#     className='my-3',
-# )
-
 navbar = dbc.NavbarSimple(
     children=[
-        dbc.NavItem(dbc.NavLink('Page 1', href='#')),
         dbc.DropdownMenu(
             children=[
                 dbc.DropdownMenuItem(
@@ -50,6 +34,35 @@ navbar = dbc.NavbarSimple(
             nav=True,
             in_navbar=True,
             label='Cancellation',
+        ),
+        dbc.DropdownMenu(
+            children=[
+                dbc.DropdownMenuItem(
+                    children='Retention By Order',
+                    href='/retention-by-order',
+                    external_link=True
+                ),
+            ],
+            nav=True,
+            in_navbar=True,
+            label='Retention',
+        ),
+        dbc.DropdownMenu(
+            children=[
+                dbc.DropdownMenuItem(
+                    children='Meal Tagging',
+                    href='/meal-tag',
+                    external_link=True
+                ),
+                dbc.DropdownMenuItem(
+                    children='Price Exempt Customers',
+                    href='/price-exempt',
+                    external_link=True
+                ),
+            ],
+            nav=True,
+            in_navbar=True,
+            label='Other',
         ),
     ],
     brand='TGK Analytics',
