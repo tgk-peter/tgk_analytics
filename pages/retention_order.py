@@ -19,7 +19,7 @@ import plotly.express as px
 from app import app
 
 # Import styles
-import assets.styles as st
+import assets.styles as style
 
 # Import .env variables #
 load_dotenv()  # take environment variables from .env
@@ -172,11 +172,6 @@ conditional_style_5 = [
 conditional_style_all = conditional_style_1 + conditional_style_2 + \
     conditional_style_3 + conditional_style_4 + conditional_style_5
 
-# style_dt_cell_default = {
-#     'textAlign': 'center',
-#     'fontSize': 16,
-#     'font-family': 'Ubuntu'
-#     }
 
 # Table setup
 retention_table_percent = DataTable(
@@ -184,7 +179,7 @@ retention_table_percent = DataTable(
     columns=retention_table_percent_columns,
     data=df_retain_orders_percent_table.to_dict('records'),
     page_size=26,
-    style_cell=st.style_dt_cell_default,
+    style_cell=style.dt_cell,
     filter_action='native',
     style_data_conditional=conditional_style_all,
 )
