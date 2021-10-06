@@ -7,9 +7,6 @@
 ###########
 
 # Import Packages #
-#import cryptpandas as crp
-#from github import Github
-#import json
 import pandas as pd
 import requests
 from sqlalchemy import create_engine
@@ -20,8 +17,6 @@ from dotenv import load_dotenv
 import os
 load_dotenv()  # take environment variables from .env
 RECHARGE_API_TOKEN = os.getenv('RECHARGE_API_TOKEN')
-#CRP_PASSWORD = os.getenv('CRP_PASSWORD')
-#GITHUB_ACCESS_TOKEN = os.getenv('GITHUB_ACCESS_TOKEN')
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 ###########################################
