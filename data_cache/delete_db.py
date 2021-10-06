@@ -11,5 +11,5 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 # link to your database
 engine = create_engine(DATABASE_URL, echo=False)
 
-# run a quick test
-print(engine.execute('SELECT * FROM test_db').fetchone())
+# delete table
+test_db.drop()
