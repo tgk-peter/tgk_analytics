@@ -38,7 +38,7 @@ def get_recharge_sub_api(status):
     # Access and store first page of subscription results
     # REMOVE CREATED_AT_MIN #
     url = f'https://api.rechargeapps.com/subscriptions?\
-    status={status}&limit={limit}&created_at_min=2021-07-10'
+    status={status}&limit={limit}'
     response = requests.get(url, headers=headers)
     response_data = response.json()
     all_records = response_data['subscriptions']
