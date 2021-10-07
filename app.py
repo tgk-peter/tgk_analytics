@@ -13,7 +13,11 @@ VALID_USERNAME_PASSWORD_PAIRS = {dash_username: dash_password}
 
 # Dash instance #
 external_stylesheets = [dbc.themes.UNITED]
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app = dash.Dash(
+    __name__,
+    external_stylesheets=external_stylesheets,
+    title='TGK Analytics'
+)
 auth = dash_auth.BasicAuth(
     app,
     VALID_USERNAME_PASSWORD_PAIRS,
