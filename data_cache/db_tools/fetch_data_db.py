@@ -12,4 +12,4 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 engine = create_engine(DATABASE_URL, echo=False)
 
 # run a quick test
-print(engine.execute('SELECT * FROM test_db').fetchone())
+print(engine.execute('SELECT * FROM cancel_db').fetchone())

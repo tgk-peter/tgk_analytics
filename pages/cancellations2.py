@@ -9,6 +9,7 @@ import dash_html_components as html
 import plotly.express as px
 
 import pandas as pd
+import psycopg2
 import cryptpandas as crp
 
 from dotenv import load_dotenv
@@ -17,14 +18,23 @@ import os
 # Import .env variables #
 load_dotenv()  # take environment variables from .env
 CRP_PASSWORD = os.getenv('CRP_PASSWORD')
+DATABASE_URL = os.getenv('DATABASE_URL')
 
 # Import Dash Instance #
 from app import app
 
 # DATAFRAMES #
 # Decrypt and load cancelled subscription dataframe
-df_cancel = crp.read_encrypted(path='data_cache/cancel_sub_cache.crypt',
-                               password=CRP_PASSWORD)
+# Load cancelled subscription dataframe from database #
+con = psycopg2.connect(DATABASE_URL)
+cur = con.cursor()
+query = f"""SELECT *
+            FROM cancel_db
+            """
+df_cancel = pd.read_sql(query, con)
+con.close()
+
+# restrict to after 06/01/2019
 df_cancel = df_cancel[df_cancel['cancelled_at'] > '2019-06-01']
 
 # Group by month and cancellation reason. Count emails.
