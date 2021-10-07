@@ -30,6 +30,7 @@ query = f"""SELECT *
             FROM cancel_db
             """
 df_cancel = pd.read_sql(query, con)
+con.close()
 
 # LAYOUT #
 
