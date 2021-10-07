@@ -6,7 +6,6 @@ import dash_bootstrap_components as dbc
 from dash_extensions import Download
 from dash_extensions.snippets import send_data_frame
 
-import cryptpandas as crp
 from datetime import date  # , timedelta, datetime as dt
 from dotenv import load_dotenv
 import os
@@ -16,7 +15,6 @@ import psycopg2
 # Import .env variables
 
 load_dotenv()  # take environment variables from .env
-CRP_PASSWORD = os.getenv('CRP_PASSWORD')
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 # Import Dash Instance #
@@ -242,6 +240,7 @@ def update_total_cancels(start_date, end_date):
     df_cancel_total = df_cancel_slice["cancellation_reason"].value_counts().sum()
     return html.H5(f'Total Cancellations = {df_cancel_total}')
 
+
 @app.callback(
     Output(
         component_id='cancel_counts_container',
@@ -308,7 +307,7 @@ def update_reason_table(start_date, end_date):
         responsive=True,
     )
 
-##
+
 @app.callback(
     Output(
         component_id='download_reason_csv',
