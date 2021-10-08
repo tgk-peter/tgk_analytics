@@ -1,21 +1,26 @@
 # update_active_table.py
-# Create db table from Shopify API to reduce execution time in Dash app.
+# Create db table of active subscription orders
+# from Shopify API to reduce execution time in Dash app.
+
+###########
+# IMPORTS #
+###########
 
 # Import Packages #
 
-import cryptpandas as crp
 from dotenv import load_dotenv
-from github import Github
 import os
 import pandas as pd
 import requests
+from sqlalchemy import create_engine
 import time
 
 # Import .env variables #
 load_dotenv()  # take environment variables from .env
-CRP_PASSWORD = os.getenv('CRP_PASSWORD')
 SHOPIFY_PASSWORD = os.getenv('SHOPIFY_PASSWORD')
-GITHUB_ACCESS_TOKEN = os.getenv('GITHUB_ACCESS_TOKEN')
+DATABASE_URL = os.getenv('DATABASE_URL')
+# replace database_url prefix w/ 'postgresql' so sqlalchemy create_engine works
+HEROKU_DB_URL = DATABASE_URL.replace('postgres://', 'postgresql://')
 
 #####################################
 # Get Data from Shopify Order API ###
@@ -57,7 +62,7 @@ def get_shopify_order_api(endpoint, status):
         next_url = response.links["next"]["url"]
         response = session.get(next_url, headers=headers)
         count += 1
-        print(f'# of request cycles: {count}')
+        # print(f'# of request cycles: {count}')
         response_data = response.json()
         all_records.extend(response_data['orders'])
         # Sleep to avoid rate limit if approach bucket size
@@ -70,7 +75,7 @@ def get_shopify_order_api(endpoint, status):
 
 
 def generate_active_order_df(records, path):
-    '''Create, encrypt, store cancellation DataFrame
+    '''Create and store active order DataFrame in database
 
     Keyword arguments:
     records -- dictionary of records from API
@@ -85,7 +90,8 @@ def generate_active_order_df(records, path):
     df_orders_sub = pd.json_normalize(
         records,
         record_path='line_items',
-        meta=['email', 'order_number', 'created_at', 'cancelled_at'])
+        meta=['email', 'order_number', 'created_at', 'cancelled_at']
+    )
     df_orders_sub = df_orders_sub.loc[:, ['email', 'order_number',
                                           'created_at', 'sku', 'cancelled_at']]
     df_orders_sub['created_at'] = pd.to_datetime(df_orders_sub['created_at'])
@@ -93,39 +99,24 @@ def generate_active_order_df(records, path):
     df_orders_sub = df_orders_sub[df_orders_sub['sku'].str.contains('SUB')]
     df_orders_sub = df_orders_sub[df_orders_sub['cancelled_at'].isnull()]
 
-    # Encrypt and store the df locally
-    crp.to_encrypted(df_orders_sub, password=CRP_PASSWORD, path=path)
+    # Convert DataFrame to sql and store in database
+    engine = create_engine(HEROKU_DB_URL, echo=False)
+    df_orders_sub.to_sql('active_sub',
+                         con=engine,
+                         if_exists='replace',
+                         index=False
+                         )
+
+##########################################
+# Get active Shopify subscription orders #
+##########################################
 
 
-def github_update(file_path):
-    '''Read file content and update in github repository
-
-    Keyword arguments:
-    file_path -- path of file to read and update
-    '''
-    with open(file_path) as file:
-        file_content = file.read()
-    github = Github(GITHUB_ACCESS_TOKEN)
-    repo = github.get_user().get_repo('tgk_analytics')
-    contents = repo.get_contents(file_path)
-    repo.update_file(
-        path=contents.path,
-        message='next commit',
-        content=file_content,
-        sha=contents.sha,
-    )
-
-# Get all active Shopify orders #
-
-
-active_orders = get_shopify_order_api(
+all_orders = get_shopify_order_api(
     endpoint='admin/api/2021-07/orders.json',
     status='any',
 )
 generate_active_order_df(
-    records=active_orders,
+    records=all_orders,
     path='data_cache/active_order_cache.crypt',
 )
-# github_update(
-#     file_path='data_cache/active_order_cache.crypt',
-# )
