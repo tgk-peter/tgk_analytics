@@ -18,6 +18,8 @@ import os
 load_dotenv()  # take environment variables from .env
 RECHARGE_API_TOKEN = os.getenv('RECHARGE_API_TOKEN')
 DATABASE_URL = os.getenv('DATABASE_URL')
+# replace database_url prefix w/ 'postgresql' so sqlalchemy create_engine works
+HEROKU_DB_URL = DATABASE_URL.replace('postgres://', 'postgresql://')
 
 ###########################################
 # Get Data from Recharge Subscription API #
@@ -76,7 +78,7 @@ def generate_dataframe(records):
     df_cancel['cancellation_reason'].fillna('None', inplace=True)
 
     # Convert DataFrame to sql and store in database
-    engine = create_engine(DATABASE_URL, echo=False)
+    engine = create_engine(HEROKU_DB_URL, echo=False)
     df_cancel.to_sql('cancel_db', con=engine, if_exists='replace', index=False)
 
 # Get and store cancelled subscriptions #
