@@ -16,13 +16,15 @@ import psycopg2
 
 load_dotenv()  # take environment variables from .env
 DATABASE_URL = os.getenv('DATABASE_URL')
+# replace database_url prefix w/ 'postgresql' so sqlalchemy create_engine works
+HEROKU_DB_URL = DATABASE_URL.replace('postgres://', 'postgresql://')
 
 # Import Dash Instance #
 from app import app
 
 # DATAFRAME #
 # Load cancelled subscription dataframe from database #
-con = psycopg2.connect(DATABASE_URL)
+con = psycopg2.connect(HEROKU_DB_URL)
 cur = con.cursor()
 query = f"""SELECT *
             FROM cancel_db

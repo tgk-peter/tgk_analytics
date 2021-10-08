@@ -10,15 +10,15 @@ import plotly.express as px
 
 import pandas as pd
 import psycopg2
-import cryptpandas as crp
 
 from dotenv import load_dotenv
 import os
 
 # Import .env variables #
 load_dotenv()  # take environment variables from .env
-CRP_PASSWORD = os.getenv('CRP_PASSWORD')
 DATABASE_URL = os.getenv('DATABASE_URL')
+# replace database_url prefix w/ 'postgresql' so sqlalchemy create_engine works
+HEROKU_DB_URL = DATABASE_URL.replace('postgres://', 'postgresql://')
 
 # Import Dash Instance #
 from app import app
