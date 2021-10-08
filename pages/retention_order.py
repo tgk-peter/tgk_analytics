@@ -1,8 +1,10 @@
 # retention_order.py
 # Generate order retention cohorts for TGK customers
 
+###########
+# IMPORTS #
+###########
 # Import Packages #
-#import cryptpandas as crp
 
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
@@ -24,23 +26,22 @@ import assets.styles as style
 
 # Import .env variables #
 load_dotenv()  # take environment variables from .env
-CRP_PASSWORD = os.getenv('CRP_PASSWORD')
+DATABASE_URL = os.getenv('DATABASE_URL')
+# replace database_url prefix w/ 'postgresql' for consistency w/ sqlalchemy
+HEROKU_DB_URL = DATABASE_URL.replace('postgres://', 'postgresql://')
 
+##############
 # DataFrames #
-# Read in encrypted DataFrame
+##############
+
 # Load active subscription orders from database #
 con = psycopg2.connect(DATABASE_URL)
 cur = con.cursor()
 query = f"""SELECT *
-            FROM cancel_db
+            FROM active_sub
             """
-df_cancel = pd.read_sql(query, con)
+df_orders_sub = pd.read_sql(query, con)
 con.close()
-
-
-
-df_orders_sub = crp.read_encrypted(path='data_cache/active_order_cache.crypt',
-                                   password=CRP_PASSWORD)
 
 # Groupby email and reset index. Aggregrate first order date and order count.
 df_orders_group = df_orders_sub.groupby('email', as_index=False)
@@ -67,6 +68,8 @@ def df_retain_orders_columns():
 
 # Resample into weeks to generate absolute counts #
 # subtract 6 days from first order date to align with Monday start
+
+
 df_orders_agg['first_order_date'] = (df_orders_agg['first_order_date']
                                      - pd.to_timedelta(6, unit='d'))
 df_retain_orders = df_orders_agg.groupby(
