@@ -74,7 +74,7 @@ def get_shopify_order_api(endpoint, status):
 #########
 
 
-def generate_active_order_df(records, path):
+def generate_active_order_df(records):
     '''Create and store active order DataFrame in database
 
     Keyword arguments:
@@ -117,6 +117,5 @@ all_orders = get_shopify_order_api(
     status='any',
 )
 generate_active_order_df(
-    records=all_orders,
-    path='data_cache/active_order_cache.crypt',
+    records=all_orders
 )

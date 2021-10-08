@@ -2,7 +2,7 @@
 # Generate order retention cohorts for TGK customers
 
 # Import Packages #
-import cryptpandas as crp
+#import cryptpandas as crp
 
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
@@ -14,6 +14,7 @@ from dotenv import load_dotenv
 import os
 import pandas as pd
 import plotly.express as px
+import psycopg2
 
 # Import Dash Instance #
 from app import app
@@ -27,6 +28,17 @@ CRP_PASSWORD = os.getenv('CRP_PASSWORD')
 
 # DataFrames #
 # Read in encrypted DataFrame
+# Load active subscription orders from database #
+con = psycopg2.connect(DATABASE_URL)
+cur = con.cursor()
+query = f"""SELECT *
+            FROM cancel_db
+            """
+df_cancel = pd.read_sql(query, con)
+con.close()
+
+
+
 df_orders_sub = crp.read_encrypted(path='data_cache/active_order_cache.crypt',
                                    password=CRP_PASSWORD)
 
