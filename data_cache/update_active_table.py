@@ -94,7 +94,7 @@ def generate_active_order_df(records):
     )
     df_orders_sub = df_orders_sub.loc[:, ['email', 'order_number',
                                           'created_at', 'sku', 'cancelled_at']]
-    df_orders_sub['created_at'] = pd.to_datetime(df_orders_sub['created_at'])
+#    df_orders_sub['created_at'] = pd.to_datetime(df_orders_sub['created_at'])
     df_orders_sub['sku'].fillna('No SKU', inplace=True)
     df_orders_sub = df_orders_sub[df_orders_sub['sku'].str.contains('SUB')]
     df_orders_sub = df_orders_sub[df_orders_sub['cancelled_at'].isnull()]
