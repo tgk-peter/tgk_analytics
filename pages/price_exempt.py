@@ -52,10 +52,15 @@ charge_get = get_recharge_charges(
              date_max=(date.today() + timedelta(days=2)).strftime('%Y-%m-%d')
 )
 
-# Create df from data
+# Create df from data. Create empty df if no charges in que.
 df_charge = pd.json_normalize(charge_get)
-df_charge = df_charge[['address_id', 'scheduled_at', 'total_price', 'email',
-                      'first_name', 'last_name']]
+try:
+    df_charge = df_charge[['address_id', 'scheduled_at', 'total_price',
+                           'email', 'first_name', 'last_name']]
+except KeyError:
+    df_charge = pd.DataFrame(columns=['address_id', 'scheduled_at',
+                                      'total_price', 'email', 'first_name',
+                                      'last_name'])
 
 # Load price exempt customer df
 exempt_path = 'data_cache/price_exempt_all.csv'
