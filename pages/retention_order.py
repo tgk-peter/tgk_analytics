@@ -40,8 +40,9 @@ cur = con.cursor()
 query = f"""SELECT *
             FROM active_sub
             """
+df_orders_sub = pd.read_sql(query, con)
 # switch to_datetime to when table is read in
-df_orders_sub = pd.read_sql(query, con, parse_dates=['created_at'])
+# df_orders_sub = pd.read_sql(query, con, parse_dates=['created_at'])
 con.close()
 
 # Groupby email and reset index. Aggregrate first order date and order count.
