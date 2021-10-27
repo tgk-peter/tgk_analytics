@@ -258,11 +258,21 @@ def retrieve_yotpo_balance(customer_email):
         component_property='end_date',
     )
 )
+# def df_store(start_date, end_date):
+#     ''' Update dcc.Store(id=df_cancel_slice)
+#     '''
+#     df_cancel_slice = time_slice(start_date, end_date)
+#     return df_cancel_slice.to_dict('records')
 def df_store(start_date, end_date):
     ''' Update dcc.Store(id=df_cancel_slice)
     '''
     df_cancel_slice = time_slice(start_date, end_date)
-    return df_cancel_slice.to_dict('records')
+    df_cancel_reasons = df_non_empty(df_cancel_slice=df_cancel_slice)
+    dataframes = {
+        'df_cancel_slice': df_cancel_slice.to_dict('records'),
+        'df_cancel_reasons': df_cancel_reasons.to_dict('records'),
+    }
+    return dataframes
 
 
 @app.callback(
@@ -278,7 +288,7 @@ def df_store(start_date, end_date):
 def update_total_cancels(data):
     ''' Update cancellation total display
     '''
-    df_cancel_slice = pd.DataFrame.from_dict(data)
+    df_cancel_slice = pd.DataFrame.from_dict(data['df_cancel_slice'])
     df_cancel_total = df_cancel_slice["cancellation_reason"].value_counts().sum()
     return html.H5(f'Total Cancellations = {df_cancel_total}')
 
@@ -296,7 +306,7 @@ def update_total_cancels(data):
 def update_count_table(data):
     ''' Update cancel counts container with table
     '''
-    df_cancel_slice = pd.DataFrame.from_dict(data)
+    df_cancel_slice = pd.DataFrame.from_dict(data['df_cancel_slice'])
     df_cancel_counts = df_cancel_slice["cancellation_reason"].value_counts()\
         .to_frame().reset_index()
     df_cancel_counts.rename(
@@ -326,10 +336,8 @@ def update_count_table(data):
 def update_reason_table(data):
     ''' Update cancel reasons table
     '''
-    df_cancel_slice = pd.DataFrame.from_dict(data)
-
     # Dataframe for non-empty reasons
-    df_cancel_reasons = df_non_empty(df_cancel_slice=df_cancel_slice)
+    df_cancel_reasons = pd.DataFrame.from_dict(data['df_cancel_reasons'])
 
     # Return table with DataFrame
     return dbc.Table.from_dataframe(
@@ -360,10 +368,8 @@ def update_reason_table(data):
 def download_reason_csv(n_clicks, data):
     ''' Cancel reasons download csv
     '''
-    df_cancel_slice = pd.DataFrame.from_dict(data)
-
     # Dataframe for non-empty reasons
-    df_cancel_reasons = df_non_empty(df_cancel_slice=df_cancel_slice)
+    df_cancel_reasons = pd.DataFrame.from_dict(data['df_cancel_reasons'])
 
     return send_data_frame(df_cancel_reasons.to_csv,
                            f"cancel_comments.csv")
@@ -386,7 +392,7 @@ def download_reason_csv(n_clicks, data):
 def update_customer_by_reason_table(data, value):
     ''' Update customers by cancel reason table
     '''
-    df_cancel_slice = pd.DataFrame.from_dict(data)
+    df_cancel_slice = pd.DataFrame.from_dict(data['df_cancel_slice'])
 
     # Dataframe for customers by reason
     if value == 'All Reasons':
@@ -435,7 +441,7 @@ def update_customer_by_reason_table(data, value):
 def download_reason_csv(n_clicks, value, data):
     ''' Individual cancel reason download csv
     '''
-    df_cancel_slice = pd.DataFrame.from_dict(data)
+    df_cancel_slice = pd.DataFrame.from_dict(data['df_cancel_slice'])
 
     # Dataframe for customers by reason
     if value == 'All Reasons':
