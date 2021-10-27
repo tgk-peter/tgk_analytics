@@ -412,53 +412,6 @@ def update_customer_by_reason_table(data, value):
         responsive=True,
     )
 
-# @app.callback(
-#     Output(
-#         component_id='customers_by_reason_container',
-#         component_property='children',
-#     ),
-#     Input(
-#         component_id='date-picker-range',
-#         component_property='start_date',
-#     ),
-#     Input(
-#         component_id='date-picker-range',
-#         component_property='end_date',
-#     ),
-#     Input(
-#         component_id='reason-dropdown',
-#         component_property='value',
-#     )
-# )
-# def update_customer_by_reason_table(start_date, end_date, value):
-#     ''' Update customers by cancel reason table
-#     '''
-#     df_cancel_slice = time_slice(start_date, end_date)
-#
-#     # Dataframe for customers by reason
-#     if value == 'All Reasons':
-#         df_cancel_customers = df_cancel_slice
-#         df_cancel_customers["yotpo_point_balance"] = df_cancel_customers["email"].apply(retrieve_yotpo_balance)
-#     else:
-#         reason = df_cancel_slice["cancellation_reason"] == value
-#         df_cancel_customers = df_cancel_slice.loc[reason]
-#         df_cancel_customers["yotpo_point_balance"] = df_cancel_customers["email"].apply(retrieve_yotpo_balance)
-#
-#     df_cancel_customers = df_cancel_customers.loc[:, ["email", "cancelled_at",
-#                                                       "cancellation_reason", "yotpo_point_balance"]]
-#     df_cancel_customers = df_cancel_customers.sort_values(by="cancelled_at",
-#                                                           ascending=False)
-#
-#     # Return table with DataFrame
-#     return dbc.Table.from_dataframe(
-#         df=df_cancel_customers,
-#         id="cancel_customers",
-#         striped=True,
-#         bordered=True,
-#         hover=True,
-#         responsive=True,
-#     )
-
 
 @app.callback(
     Output(
@@ -474,19 +427,15 @@ def update_customer_by_reason_table(data, value):
         component_property='value',
     ),
     State(
-        component_id='date-picker-range',
-        component_property='start_date',
-    ),
-    State(
-        component_id='date-picker-range',
-        component_property='end_date',
+        component_id='df_cancel_slice',
+        component_property='data',
     ),
     prevent_initial_call=True,
 )
-def download_reason_csv(n_clicks, value, start_date, end_date):
+def download_reason_csv(n_clicks, value, data):
     ''' Individual cancel reason download csv
     '''
-    df_cancel_slice = time_slice(start_date, end_date)
+    df_cancel_slice = pd.DataFrame.from_dict(data)
 
     # Dataframe for customers by reason
     if value == 'All Reasons':
@@ -500,4 +449,4 @@ def download_reason_csv(n_clicks, value, start_date, end_date):
                                                           ascending=False)
 
     return send_data_frame(df_cancel_customers.to_csv,
-                           f"cancel_reason_{start_date}_{end_date}.csv")
+                           f"cancel_reason.csv")
