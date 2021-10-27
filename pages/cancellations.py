@@ -319,18 +319,14 @@ def update_count_table(data):
         component_property='children',
     ),
     Input(
-        component_id='date-picker-range',
-        component_property='start_date',
-    ),
-    Input(
-        component_id='date-picker-range',
-        component_property='end_date',
+        component_id='df_cancel_slice',
+        component_property='data',
     )
 )
-def update_reason_table(start_date, end_date):
+def update_reason_table(data):
     ''' Update cancel reasons table
     '''
-    df_cancel_slice = time_slice(start_date, end_date)
+    df_cancel_slice = pd.DataFrame.from_dict(data)
 
     # Dataframe for non-empty reasons
     df_cancel_reasons = df_non_empty(df_cancel_slice=df_cancel_slice)
@@ -344,6 +340,38 @@ def update_reason_table(start_date, end_date):
         hover=True,
         responsive=True,
     )
+
+# @app.callback(
+#     Output(
+#         component_id='cancel_reasons_container',
+#         component_property='children',
+#     ),
+#     Input(
+#         component_id='date-picker-range',
+#         component_property='start_date',
+#     ),
+#     Input(
+#         component_id='date-picker-range',
+#         component_property='end_date',
+#     )
+# )
+# def update_reason_table(start_date, end_date):
+#     ''' Update cancel reasons table
+#     '''
+#     df_cancel_slice = time_slice(start_date, end_date)
+#
+#     # Dataframe for non-empty reasons
+#     df_cancel_reasons = df_non_empty(df_cancel_slice=df_cancel_slice)
+#
+#     # Return table with DataFrame
+#     return dbc.Table.from_dataframe(
+#         df=df_cancel_reasons,
+#         id="cancel_reasons",
+#         striped=True,
+#         bordered=True,
+#         hover=True,
+#         responsive=True,
+#     )
 
 
 @app.callback(
