@@ -239,7 +239,7 @@ def retrieve_yotpo_balance(customer_email):
         }
         result = requests.get(url, headers=headers, params=querystring)
         return result.json()["points_balance"]
-    except:
+    except KeyError:
         return 0
 # CALLBACKS
 
@@ -258,11 +258,6 @@ def retrieve_yotpo_balance(customer_email):
         component_property='end_date',
     )
 )
-# def df_store(start_date, end_date):
-#     ''' Update dcc.Store(id=df_cancel_slice)
-#     '''
-#     df_cancel_slice = time_slice(start_date, end_date)
-#     return df_cancel_slice.to_dict('records')
 def df_store(start_date, end_date):
     ''' Update dcc.Store(id=df_cancel_slice)
     '''
