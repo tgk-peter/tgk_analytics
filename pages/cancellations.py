@@ -288,19 +288,15 @@ def update_total_cancels(data):
         component_id='cancel_counts_container',
         component_property='children',
     ),
-    [Input(
-        component_id='date-picker-range',
-        component_property='start_date',
-    ),
     Input(
-        component_id='date-picker-range',
-        component_property='end_date',
-    )]
+        component_id='df_cancel_slice',
+        component_property='data',
+    )
 )
-def update_count_table(start_date, end_date):
+def update_count_table(data):
     ''' Update cancel counts container with table
     '''
-    df_cancel_slice = time_slice(start_date, end_date)
+    df_cancel_slice = pd.DataFrame.from_dict(data)
     df_cancel_counts = df_cancel_slice["cancellation_reason"].value_counts()\
         .to_frame().reset_index()
     df_cancel_counts.rename(
