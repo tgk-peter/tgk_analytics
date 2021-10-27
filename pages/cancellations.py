@@ -56,6 +56,7 @@ dropdown = dcc.Dropdown(
 # Page layout
 layout = html.Div(
     children=[
+        dcc.Store(id='df_cancel_slice'),
         html.H1('Cancellations'),
         dbc.Row(
             children=[
@@ -240,11 +241,13 @@ def retrieve_yotpo_balance(customer_email):
         return result.json()["points_balance"]
     except:
         return 0
+# CALLBACKS
+
 
 @app.callback(
     Output(
-        component_id='cancel_total_box',
-        component_property='children',
+        component_id='df_cancel_slice',
+        component_property='data',
     ),
     Input(
         component_id='date-picker-range',
@@ -255,10 +258,27 @@ def retrieve_yotpo_balance(customer_email):
         component_property='end_date',
     )
 )
-def update_total_cancels(start_date, end_date):
-    ''' Update cancellation total display
+def df_store(start_date, end_date):
+    ''' Update dcc.Store(id=df_cancel_slice)
     '''
     df_cancel_slice = time_slice(start_date, end_date)
+    return df_cancel_slice.to_dict('records')
+
+
+@app.callback(
+    Output(
+        component_id='cancel_total_box',
+        component_property='children',
+    ),
+    Input(
+        component_id='df_cancel_slice',
+        component_property='data',
+    )
+)
+def update_total_cancels(data):
+    ''' Update cancellation total display
+    '''
+    df_cancel_slice = pd.DataFrame.from_dict(data)
     df_cancel_total = df_cancel_slice["cancellation_reason"].value_counts().sum()
     return html.H5(f'Total Cancellations = {df_cancel_total}')
 
