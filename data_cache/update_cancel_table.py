@@ -17,8 +17,10 @@ from dotenv import load_dotenv
 import os
 load_dotenv()  # take environment variables from .env
 RECHARGE_API_TOKEN = os.getenv('RECHARGE_API_TOKEN')
-DATABASE_URL = os.getenv('DATABASE_URL')
+YOTPO_X_GUID = os.getenv('YOTPO_X_GUID')
+YOTPO_X_API_KEY = os.getenv('YOTPO_X_API_KEY')
 # replace database_url prefix w/ 'postgresql' so sqlalchemy create_engine works
+DATABASE_URL = os.getenv('DATABASE_URL')
 HEROKU_DB_URL = DATABASE_URL.replace('postgres://', 'postgresql://')
 
 ###########################################
@@ -38,7 +40,6 @@ def get_recharge_sub_api(status):
     limit = 250
 
     # Access and store first page of subscription results
-    # REMOVE CREATED_AT_MIN #
     url = f'https://api.rechargeapps.com/subscriptions?status={status}&limit={limit}'
     response = requests.get(url, headers=headers)
     response_data = response.json()
@@ -55,6 +56,28 @@ def get_recharge_sub_api(status):
             time.sleep(0.5)
 
     return all_records
+
+
+def get_yotpo_balance(customer_email):
+    ''' Retrieve customer yotpo balance
+    '''
+    try:
+        url = "https://loyalty.yotpo.com/api/v2/customers"
+        querystring = {
+            "customer_email": customer_email,
+            "country_iso_code": "null",
+            "with_referral_code": "false",
+            "with_history": "false"
+        }
+        headers = {
+            "Accept": "application/json",
+            "x-guid": YOTPO_X_GUID,
+            "x-api-key": YOTPO_X_API_KEY
+        }
+        result = requests.get(url, headers=headers, params=querystring)
+        return result.json()["points_balance"]
+    except KeyError:
+        return 0
 
 
 def generate_dataframe(records):
@@ -76,6 +99,11 @@ def generate_dataframe(records):
     # Replace null in 'cancellation_reason' with 'None'
     df_cancel['cancellation_reason'].fillna('None', inplace=True)
     # Lookup yotpo balance for cancelled_at < 90d
+    cutoff_day = pd.Timestamp('now').floor('D') - pd.Timedelta(90, unit='D')
+    df_cancel['yotpo_point_balance'] = df_cancel.apply(
+        lambda row: get_yotpo_balance(row['email']) if row['cancelled_at'] > cutoff_day else 0,
+        axis=1
+        )
 
     # Convert DataFrame to sql and store in database
     engine = create_engine(HEROKU_DB_URL, echo=False)
