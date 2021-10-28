@@ -39,8 +39,7 @@ def get_recharge_sub_api(status):
 
     # Access and store first page of subscription results
     # REMOVE CREATED_AT_MIN #
-    url = f'https://api.rechargeapps.com/subscriptions?\
-    status={status}&limit={limit}'
+    url = f'https://api.rechargeapps.com/subscriptions?status={status}&limit={limit}'
     response = requests.get(url, headers=headers)
     response_data = response.json()
     all_records = response_data['subscriptions']
@@ -76,6 +75,7 @@ def generate_dataframe(records):
     df_cancel['cancelled_at'] = pd.to_datetime(df_cancel['cancelled_at'])
     # Replace null in 'cancellation_reason' with 'None'
     df_cancel['cancellation_reason'].fillna('None', inplace=True)
+    # Lookup yotpo balance for cancelled_at < 90d
 
     # Convert DataFrame to sql and store in database
     engine = create_engine(HEROKU_DB_URL, echo=False)
