@@ -315,6 +315,16 @@ def update_reason_table(data):
     '''
     # Dataframe for non-empty reasons
     df_cancel_reasons = pd.DataFrame.from_dict(data['df_cancel_reasons'])
+    df_cancel_reasons.rename(
+        columns={
+            "email": "Email",
+            "cancelled_at": "Cancelled",
+            "cancellation_reason": "Cancellation Reason",
+            "cancellation_reason_comments": "Comments",
+            "yotpo_point_balance": "Yotpo Points"
+            },
+        inplace=True
+    )
 
     # Return table with DataFrame
     return dbc.Table.from_dataframe(
@@ -377,11 +387,18 @@ def update_customer_by_reason_table(data, value):
     else:
         reason = df_cancel_slice["cancellation_reason"] == value
         df_cancel_customers = df_cancel_slice.loc[reason]
-
-    df_cancel_customers = df_cancel_customers.loc[:, ["email", "cancelled_at",
-                                                      "cancellation_reason", "yotpo_point_balance"]]
     df_cancel_customers = df_cancel_customers.sort_values(by="cancelled_at",
                                                           ascending=False)
+    df_cancel_customers.rename(
+        columns={
+            "email": "Email",
+            "cancelled_at": "Cancelled",
+            "cancellation_reason": "Cancellation Reason",
+            "cancellation_reason_comments": "Comments",
+            "yotpo_point_balance": "Yotpo Points"
+            },
+        inplace=True
+    )
 
     # Return table with DataFrame
     return dbc.Table.from_dataframe(
