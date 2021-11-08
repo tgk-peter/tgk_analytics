@@ -223,24 +223,6 @@ def df_non_empty(df_cancel_slice):
     return df_cancel_reasons
 
 
-def retrieve_yotpo_balance(customer_email):
-    try:
-        url = "https://loyalty.yotpo.com/api/v2/customers"
-        querystring = {
-            "customer_email": customer_email,
-            "country_iso_code": "null",
-            "with_referral_code": "false",
-            "with_history": "false"
-        }
-        headers = {
-            "Accept": "application/json",
-            "x-guid": YOTPO_X_GUID,
-            "x-api-key": YOTPO_X_API_KEY
-        }
-        result = requests.get(url, headers=headers, params=querystring)
-        return result.json()["points_balance"]
-    except KeyError:
-        return 0
 # CALLBACKS
 
 
@@ -392,11 +374,9 @@ def update_customer_by_reason_table(data, value):
     # Dataframe for customers by reason
     if value == 'All Reasons':
         df_cancel_customers = df_cancel_slice
-        #df_cancel_customers["yotpo_point_balance"] = df_cancel_customers["email"].apply(retrieve_yotpo_balance)
     else:
         reason = df_cancel_slice["cancellation_reason"] == value
         df_cancel_customers = df_cancel_slice.loc[reason]
-        #df_cancel_customers["yotpo_point_balance"] = df_cancel_customers["email"].apply(retrieve_yotpo_balance)
 
     df_cancel_customers = df_cancel_customers.loc[:, ["email", "cancelled_at",
                                                       "cancellation_reason", "yotpo_point_balance"]]
