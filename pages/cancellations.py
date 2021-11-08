@@ -392,11 +392,11 @@ def update_customer_by_reason_table(data, value):
     # Dataframe for customers by reason
     if value == 'All Reasons':
         df_cancel_customers = df_cancel_slice
-        df_cancel_customers["yotpo_point_balance"] = df_cancel_customers["email"].apply(retrieve_yotpo_balance)
+        #df_cancel_customers["yotpo_point_balance"] = df_cancel_customers["email"].apply(retrieve_yotpo_balance)
     else:
         reason = df_cancel_slice["cancellation_reason"] == value
         df_cancel_customers = df_cancel_slice.loc[reason]
-        df_cancel_customers["yotpo_point_balance"] = df_cancel_customers["email"].apply(retrieve_yotpo_balance)
+        #df_cancel_customers["yotpo_point_balance"] = df_cancel_customers["email"].apply(retrieve_yotpo_balance)
 
     df_cancel_customers = df_cancel_customers.loc[:, ["email", "cancelled_at",
                                                       "cancellation_reason", "yotpo_point_balance"]]
