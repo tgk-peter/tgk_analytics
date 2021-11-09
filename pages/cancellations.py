@@ -357,6 +357,16 @@ def download_reason_csv(n_clicks, data):
     '''
     # Dataframe for non-empty reasons
     df_cancel_reasons = pd.DataFrame.from_dict(data['df_cancel_reasons'])
+    df_cancel_reasons.rename(
+        columns={
+            "email": "Email",
+            "cancelled_at": "Cancelled",
+            "cancellation_reason": "Cancellation Reason",
+            "cancellation_reason_comments": "Comments",
+            "yotpo_point_balance": "Yotpo Points"
+            },
+        inplace=True
+    )
 
     return send_data_frame(df_cancel_reasons.to_csv,
                            f"cancel_comments.csv")
@@ -441,10 +451,17 @@ def download_reason_csv(n_clicks, value, data):
     else:
         reason = df_cancel_slice["cancellation_reason"] == value
         df_cancel_customers = df_cancel_slice.loc[reason]
-    df_cancel_customers = df_cancel_customers.loc[:, ["email", "cancelled_at",
-                                                      "cancellation_reason"]]
     df_cancel_customers = df_cancel_customers.sort_values(by="cancelled_at",
                                                           ascending=False)
-
+    df_cancel_customers.rename(
+        columns={
+            "email": "Email",
+            "cancelled_at": "Cancelled",
+            "cancellation_reason": "Cancellation Reason",
+            "cancellation_reason_comments": "Comments",
+            "yotpo_point_balance": "Yotpo Points"
+            },
+        inplace=True
+    )
     return send_data_frame(df_cancel_customers.to_csv,
                            f"cancel_reason.csv")
