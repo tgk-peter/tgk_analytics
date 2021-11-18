@@ -74,7 +74,6 @@ dependencies:
   - zlib=1.2.11=h1de35cc_3
   - pip:
     - brotli==1.0.9
-    - cryptpandas==0.1.1
     - dash-core-components==1.15.0
     - dash-extensions==0.0.58
     - dash-html-components==1.1.2
