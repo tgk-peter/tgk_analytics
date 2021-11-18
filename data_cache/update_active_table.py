@@ -13,6 +13,7 @@ import os
 import pandas as pd
 import requests
 from sqlalchemy import create_engine
+from sqlalchemy.types import DateTime
 import time
 
 # Import .env variables #
@@ -104,7 +105,8 @@ def generate_active_order_df(records):
     df_orders_sub.to_sql('active_sub',
                          con=engine,
                          if_exists='replace',
-                         index=False
+                         index=False,
+                         dtype={'created_at': DateTime()}
                          )
 
 ##########################################
