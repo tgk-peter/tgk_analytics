@@ -81,7 +81,7 @@ layout = dbc.Jumbotron(
 # Callback function
 def generate_tags(ingredient_input, lowfat_checked, keto_checked):
   ## Process ingredient input ##
-  # Remove any parentheses
+    # Remove any parentheses
   ingredient_list_1 = ingredient_input.replace(" (", ", ").replace(")", "")
   # Remove any brackets
   ingredient_list_2 = ingredient_list_1.replace(" [", ", ").replace("]", "")
