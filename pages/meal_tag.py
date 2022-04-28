@@ -92,12 +92,13 @@ def generate_tags(ingredient_input, lowfat_checked, keto_checked):
   # make all lowercase, split to list, remove commas
   ingredient_list = ingredient_list_4.lower().split(", ")
 
-  ## Tag definitions ##
+  ## Tag definitions ##"
   ingredient_egg = ["egg$", "eggs$"]
   ingredient_beef = ["beef", "steak"]
   ingredient_pork = ["pork", "chorizo"]
   ingredient_chicken = ["chicken"]
   ingredient_seafood = ["shrimp", "salmon",	"cod"]
+  ingredient_game = ["boar", "bison", "venison"]
   paleo_prohib = ['wheat', 'rye', 'parboiled rice', 'barley', '^corn', 'oats',
                   'white potato', 'yukon gold potato','black bean', 'white rice', 'soy', '^milk',
                   'cheese', 'yogurt', '^butter$', 'quinoa', 'brown rice']
@@ -159,6 +160,8 @@ def generate_tags(ingredient_input, lowfat_checked, keto_checked):
                          for ingredient in ingredient_list)
   contains_seafood = any(re.search(tag, ingredient) for tag in ingredient_seafood
                          for ingredient in ingredient_list)
+  contains_game = any(re.search(tag, ingredient) for tag in ingredient_game
+                      for ingredient in ingredient_list)
   contains_paleo_prohib = any(re.search(tag, ingredient) for tag in paleo_prohib
                               for ingredient in ingredient_list)
   contains_primal_prohib = any(re.search(tag, ingredient) for tag in primal_prohib
@@ -194,45 +197,47 @@ def generate_tags(ingredient_input, lowfat_checked, keto_checked):
     meal_tags.append("meal-type-lunch-and-dinner")
   # Protein Tags
   if contains_beef == True:
-    meal_tags.append("ingredient-beef")
+    meal_tags.append("Beef")
   elif contains_pork == True:
-    meal_tags.append("ingredient-pork")
+    meal_tags.append("Pork")
   elif contains_chicken == True:
-    meal_tags.append("ingredient-chicken")
+    meal_tags.append("Chicken")
   elif contains_seafood == True:
-    meal_tags.append("ingredient-seafood")
+    meal_tags.append("Seafood")
+  elif contains_game == True:
+    meal_tags.append("Game")
   else:
-    meal_tags.append("ingredient-vegetarian")
+    meal_tags.append("Vegetarian")
   # Diet tags
   if contains_paleo_prohib == False:
-    meal_tags.append("diet-paleo")
+    meal_tags.append("Paleo")
   if contains_primal_prohib == False:
-    meal_tags.append("diet-primal")
+    meal_tags.append("Primal")
   if contains_whole30_prohib == False:
-    meal_tags.append("diet-whole-30-approved")
+    meal_tags.append("Whole30 Approved")
   if lowfat_checked:
-    meal_tags.append("diet-low-fat")
+    meal_tags.append("Low Fat")
   if keto_checked:
-    meal_tags.append("diet-keto")
+    meal_tags.append("Keto")
   # Allergen tags
-  if contains_dairy == True:
-    meal_tags.append("allergen-dairy")
-  if contains_egg == True:
-    meal_tags.append("allergen-egg")
-  if contains_shellfish == True:
-    meal_tags.append("allergen-shellfish")
-  if contains_tree_nuts == True:
-    meal_tags.append("allergen-tree-nuts")
-  if contains_onion == True:
-    meal_tags.append("ingredient-onions")
-  if contains_garlic == True:
-    meal_tags.append("ingredient-garlic")
-  if contains_nightshades == True:
-    meal_tags.append("ingredient-nightshades")
-  if contains_mushrooms == True:
-    meal_tags.append("ingredient-mushrooms")
-  if contains_spicy == True:
-    meal_tags.append("ingredient-spicy")
+  if contains_dairy == False:
+    meal_tags.append("No Dairy")
+  if contains_egg == False:
+    meal_tags.append("No Egg")
+  if contains_shellfish == False:
+    meal_tags.append("No Shellfish")
+  if contains_tree_nuts == False:
+    meal_tags.append("No Tree Nuts")
+  if contains_onion == False:
+    meal_tags.append("No Onions")
+  if contains_garlic == False:
+    meal_tags.append("No Garlic")
+  if contains_nightshades == False:
+    meal_tags.append("No Nightshades")
+  if contains_mushrooms == False:
+    meal_tags.append("No Mushrooms")
+  if contains_spicy == False:
+    meal_tags.append("Not Spicy")
 
   # Return final tag set
   return ", ".join(meal_tags)
