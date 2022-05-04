@@ -189,12 +189,13 @@ def generate_tags(ingredient_input, lowfat_checked, keto_checked):
 
   ## Create Tag Set ##
   # initialize tag set
-  meal_tags = ["diet-gluten-free"]
+  # meal_tags = ["diet-gluten-free"]
+  meal_tags = []
   # Meal type tags
-  if contains_egg == True:
-    meal_tags.append("meal-type-breakfast")
-  else:
-    meal_tags.append("meal-type-lunch-and-dinner")
+  # if contains_egg == True:
+  #   meal_tags.append("meal-type-breakfast")
+  # else:
+  #   meal_tags.append("meal-type-lunch-and-dinner")
   # Protein Tags
   if contains_beef == True:
     meal_tags.append("Beef")
