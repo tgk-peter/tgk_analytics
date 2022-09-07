@@ -104,7 +104,7 @@ def generate_tags(ingredient_input, lowfat_checked, keto_checked):
                   'cheese', 'yogurt', '^butter$', 'quinoa', 'brown rice']
   primal_prohib = ['lentil', 'peanut', 'pea', '^corn']
   allergen_dairy = ['^milk', '^butter$', 'butterfat', 'cheese', 'lactose',
-                    'buttermilk', 'whey', 'casein', 'ghee', 'yogurt']
+                    'buttermilk', 'whey', 'casein', 'ghee', 'yogurt', 'clarified butter']
   whole30_grains = ['wheat', 'rye', 'barley', 'oat', '^corn', 'white rice',
                     'parboiled rice', 'millet', 'bulgur', 'sorghum,',
                     'sprouted grains', 'quinoa', 'amaranth', 'buckwheat',
