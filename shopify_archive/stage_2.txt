@@ -1,0 +1,3 @@
+https://shopify.dev/docs/api/admin-rest/2023-01/resources/customer#get-customers-customer-id-orders
+https://shopify.dev/docs/api/admin-rest/2023-01/resources/discountcode#get-price-rules-price-rule-id-discount-codes
+https://shopify.dev/docs/api/admin-rest/2023-01/resources/payouts
